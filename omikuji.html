@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noai, noimageai">
+  <title>†今日のおみくじ†</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>†‡ 今日のおみくじ ‡†</h1>
+      <p>今日の運勢を占ってみましょう</p>
+    </header>
+
+    <div class="main-wrapper">
+      <aside class="sidebar">
+        <div class="sidebar-box menu">
+          <h3>* M E N U *</h3>
+          <ul>
+            <li><a href="index.html">トップ</a></li>
+            <li><a href="quotes.html">好きな言葉</a></li>
+            <li><a href="omikuji.html">今日のおみくじ</a></li>
+            <li><a href="works.html">作品集</a></li>
+            <li><a href="library.html">書庫</a></li>
+            <li><a href="poem.html">ポエム</a></li>
+            <li><a href="bbs.html">BBS</a></li>
+            <li><a href="link.html">LINK</a></li>
+          </ul>
+        </div>
+      </aside>
+
+      <main>
+        <div class="box">
+          <h2>■ おみくじを引く</h2>
+          <div style="text-align: center;">
+            <button id="omikuji-button" class="omikuji-button">おみくじを引く</button>
+          </div>
+          
+          <div id="omikuji-result" style="display: none;">
+            <div class="omikuji-result">
+              <div class="omikuji-fortune" id="omikuji-fortune"></div>
+              <div class="omikuji-message" id="omikuji-message"></div>
+              
+              <div class="omikuji-category">
+                <strong>恋愛運:</strong> <span id="omikuji-love"></span>
+              </div>
+              
+              <div class="omikuji-category">
+                <strong>仕事運:</strong> <span id="omikuji-work"></span>
+              </div>
+              
+              <div class="omikuji-category">
+                <strong>健康運:</strong> <span id="omikuji-health"></span>
+              </div>
+              
+              <div class="omikuji-category">
+                <strong>金運:</strong> <span id="omikuji-money"></span>
+              </div>
+              
+              <div class="omikuji-category">
+                <strong>学習運:</strong> <span id="omikuji-study"></span>
+              </div>
+            </div>
+          </div>
+          
+          <div id="omikuji-status" style="text-align: center; margin-top: 20px; font-weight: bold;"></div>
+        </div>
+
+        <div class="box">
+          <h2>■ 使い方</h2>
+          <p>上のボタンを押すと、今日のあなたの運勢を占うことができます。</p>
+          <p>1日1回、同じ結果が表示されます。明日になったら新しい運勢を占えます。</p>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+          <a href="index.html">トップページに戻る</a>
+        </div>
+      </main>
+    </div>
+
+    <footer>
+      <p><small>Copyright &copy; 2001-2025 eightman999 All Rights Reserved.</small></p>
+    </footer>
+  </div>
+
+  <script src="omikuji_script.js"></script>
+
+</body>
+</html>

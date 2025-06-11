@@ -21,42 +21,47 @@
     </div>
 
     <div class="main-wrapper">
-      <main>
-        <div class="box">
-          <h2>■ 投稿一覧</h2>
-          <table border="1" width="100%" style="border-collapse: collapse; font-size: 14px;">
-            <thead>
-                <tr bgcolor="#ddeeff">
-                  <th width="60%">件名</th>
-                  <th width="25%">名前</th>
-                  <th width="15%">日付</th>
-                </tr>
-            </thead>
-            <!-- JavaScriptがこのtbodyの中身を書き換えます -->
-            <tbody id="posts-table-body">
-                <tr>
-                  <td colspan="3" style="text-align:center; padding: 20px;">読み込み中...</td>
-                </tr>
-            </tbody>
-          </table>
-        </div>
-         <div style="text-align: center; margin-top: 20px;">
-            <a href="index.html">トップページに戻る</a>
-        </div>
-      </main>
-
       <aside class="sidebar">
         <div class="sidebar-box menu">
           <h3>* M E N U *</h3>
           <ul>
             <li><a href="index.html">トップ</a></li>
             <li><a href="quotes.html">好きな言葉</a></li>
+            <li><a href="omikuji.html">今日のおみくじ</a></li>
+            <li><a href="works.html">作品集</a></li>
+            <li><a href="library.html">書庫</a></li>
+            <li><a href="poem.html">ポエム</a></li>
             <li><a href="bbs.html">BBS</a></li>
             <li><a href="link.html">LINK</a></li>
           </ul>
         </div>
       </aside>
 
+      <main>
+        <div class="box">
+          <h2>■ 投稿一覧</h2>
+          <div class="table-responsive">
+            <table border="1" width="100%" style="border-collapse: collapse; font-size: 14px;">
+              <thead>
+                  <tr bgcolor="#ddeeff">
+                    <th width="60%">件名</th>
+                    <th width="25%">名前</th>
+                    <th width="15%">日付</th>
+                  </tr>
+              </thead>
+              <!-- JavaScriptがこのtbodyの中身を書き換えます -->
+              <tbody id="posts-table-body">
+                  <tr>
+                    <td colspan="3" style="text-align:center; padding: 20px;">読み込み中...</td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+         <div style="text-align: center; margin-top: 20px;">
+            <a href="index.html">トップページに戻る</a>
+        </div>
+      </main>
     </div>
 
     <footer>

@@ -9,7 +9,6 @@ body {
   /* サイトの背景色 */
   background-color: #ccccff; /* 薄い紫 */
   color: #333333;
-  
 }
 
 /* --- リンクのスタイル --- */
@@ -25,20 +24,22 @@ a:hover {
   text-decoration: none;
 }
 
-/* --- 全体を囲むコンテナ（固定幅で中央寄せ） --- */
+/* --- 全体を囲むコンテナ（レスポンシブ対応） --- */
 .container {
-  width: 960px; /* 全体の幅を広く */
-  margin: 20px auto; /* 上下のマージンも調整 */
+  max-width: 960px; /* 最大幅を設定 */
+  width: 100%; /* 幅を100%に */
+  margin: 20px auto;
   background-color: #ffffff;
   border: 2px solid #000080; /* 濃い青の枠線 */
-  padding: 20px; /* 内側の余白を広く */
+  padding: 20px;
+  box-sizing: border-box; /* paddingを含めて幅計算 */
 }
 
 /* --- ヘッダー --- */
 header {
   background-color: #99ccff; /* 水色 */
   color: #000066; /* 濃紺 */
-  padding: 20px; /* 内側の余白を広く */
+  padding: 20px;
   text-align: center;
   border: 1px dashed #000080;
 }
@@ -46,21 +47,21 @@ header {
 header h1 {
   margin: 0;
   font-family: 'Times New Roman', serif;
-  font-size: 28px; /* タイトルの文字を大きく */
+  font-size: 28px;
   font-weight: bold;
 }
 
 header p {
   margin: 8px 0 0;
-  font-size: 14px; /* 説明文を少し大きく */
+  font-size: 14px;
 }
 
 /* --- スクロールバー --- */
 .info-bar {
-  margin-top: 15px; /* 上の間隔を調整 */
+  margin-top: 15px;
   border: 1px solid #666;
-  padding: 5px 0; /* 上下の余白を追加 */
-  font-size: 14px; /* 文字を大きく */
+  padding: 5px 0;
+  font-size: 14px;
   font-weight: bold;
   color: #333;
 }
@@ -69,31 +70,34 @@ header p {
 .main-wrapper {
   display: flex;
   margin-top: 15px;
-  gap: 20px; /* 要素間の隙間を広く */
+  gap: 20px;
+}
+
+/* サイドバーを左側に配置 */
+.sidebar {
+  flex: 1;
+  order: 1; /* 左側に表示 */
 }
 
 main {
   flex: 3;
-}
-
-.sidebar {
-  flex: 1;
+  order: 2; /* 右側に表示 */
 }
 
 /* --- 各コンテンツのボックス --- */
 .box {
   background-color: #ffffff;
-  padding: 25px; /* 内側の余白を広く */
+  padding: 25px;
   margin-bottom: 15px;
   border: 1px solid #999999;
 }
 
 .box h2 {
-  font-size: 20px; /* 見出しを大きく */
+  font-size: 20px;
   color: #000066;
-  background-color: #ddeeff; /* 薄い水色 */
-  padding: 8px 15px; /* 見出しの余白を調整 */
-  margin: -25px -25px 20px -25px; /* ボックスの端まで背景色を伸ばす */
+  background-color: #ddeeff;
+  padding: 8px 15px;
+  margin: -25px -25px 20px -25px;
   border-bottom: 1px solid #999999;
 }
 
@@ -105,18 +109,17 @@ main {
   margin-bottom: 8px;
 }
 
-
 /* --- サイドバー --- */
 .sidebar-box {
-  background-color: #ffffcc; /* 薄い黄色 */
-  padding: 15px; /* 内側の余白を調整 */
+  background-color: #ffffcc;
+  padding: 15px;
   border: 1px dashed #666666;
-  font-size: 14px; /* 文字を大きく */
+  font-size: 14px;
   margin-bottom: 15px;
 }
 
 .sidebar-box h3 {
-  font-size: 16px; /* 見出しを大きく */
+  font-size: 16px;
   color: #333;
   margin: 0 0 15px 0;
   text-align: center;
@@ -139,4 +142,316 @@ footer {
   margin-top: 15px;
   border-top: 2px solid #000080;
   font-size: 12px;
+}
+
+/* --- おみくじ関連のスタイル --- */
+.omikuji-result {
+  text-align: center;
+  padding: 20px;
+  background: linear-gradient(45deg, #ffffcc, #ffeeaa);
+  border: 2px solid #cc9900;
+  border-radius: 10px;
+  margin: 20px 0;
+}
+
+.omikuji-fortune {
+  font-size: 24px;
+  font-weight: bold;
+  color: #cc0000;
+  margin-bottom: 10px;
+}
+
+.omikuji-message {
+  font-size: 16px;
+  margin: 10px 0;
+}
+
+.omikuji-category {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+}
+
+.omikuji-button {
+  background-color: #99ccff;
+  border: 2px solid #000080;
+  padding: 15px 30px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 5px;
+  color: #000066;
+}
+
+.omikuji-button:hover {
+  background-color: #66aaff;
+}
+
+/* --- 作品集のスタイル --- */
+.work-item {
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
+}
+
+.work-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #000066;
+  margin-bottom: 10px;
+}
+
+.work-tech {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.work-links {
+  margin-top: 10px;
+}
+
+.work-links a {
+  display: inline-block;
+  margin-right: 15px;
+  padding: 5px 10px;
+  background-color: #ddeeff;
+  border: 1px solid #999;
+  text-decoration: none;
+  border-radius: 3px;
+}
+
+/* --- 書庫のスタイル --- */
+.book-item {
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
+}
+
+.book-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #000066;
+  margin-bottom: 5px;
+}
+
+.book-author {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.book-rating {
+  margin: 10px 0;
+}
+
+.star {
+  color: #ff9900;
+  font-size: 18px;
+}
+
+.book-links {
+  margin-top: 10px;
+}
+
+.book-links a {
+  display: inline-block;
+  margin-right: 15px;
+  padding: 5px 10px;
+  background-color: #ddeeff;
+  border: 1px solid #999;
+  text-decoration: none;
+  border-radius: 3px;
+}
+
+/* --- ポエムのスタイル --- */
+.poem-item {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-left: 5px solid #99ccff;
+}
+
+.poem-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #000066;
+  margin-bottom: 10px;
+}
+
+.poem-content {
+  white-space: pre-line;
+  font-family: 'MS Mincho', 'ＭＳ 明朝', serif;
+  line-height: 1.8;
+  margin: 15px 0;
+}
+
+.poem-date {
+  text-align: right;
+  font-size: 12px;
+  color: #666;
+  margin-top: 10px;
+}
+
+/* --- テーブルのレスポンシブ対応 --- */
+.table-responsive {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  min-width: 500px; /* 最小幅を設定 */
+}
+
+/* === レスポンシブ対応（タブレット・スマートフォン） === */
+
+/* タブレット対応 (768px以下) */
+@media screen and (max-width: 768px) {
+  .container {
+    margin: 10px;
+    padding: 15px;
+  }
+  
+  header h1 {
+    font-size: 24px;
+  }
+  
+  header p {
+    font-size: 12px;
+  }
+  
+  .main-wrapper {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .sidebar {
+    order: 1; /* サイドバーを上に */
+  }
+  
+  main {
+    order: 2; /* メインを下に */
+  }
+  
+  .box {
+    padding: 15px;
+  }
+  
+  .box h2 {
+    font-size: 18px;
+    margin: -15px -15px 15px -15px;
+    padding: 6px 12px;
+  }
+  
+  .sidebar-box {
+    padding: 12px;
+  }
+  
+  .info-bar {
+    font-size: 12px;
+  }
+}
+
+/* スマートフォン対応 (480px以下) */
+@media screen and (max-width: 480px) {
+  .container {
+    margin: 5px;
+    padding: 10px;
+  }
+  
+  header {
+    padding: 15px 10px;
+  }
+  
+  header h1 {
+    font-size: 20px;
+  }
+  
+  header p {
+    font-size: 11px;
+  }
+  
+  .box {
+    padding: 12px;
+  }
+  
+  .box h2 {
+    font-size: 16px;
+    margin: -12px -12px 12px -12px;
+    padding: 5px 10px;
+  }
+  
+  .sidebar-box {
+    padding: 10px;
+  }
+  
+  .sidebar-box h3 {
+    font-size: 14px;
+  }
+  
+  footer {
+    padding: 10px;
+    font-size: 11px;
+  }
+  
+  /* フォーム要素の調整 */
+  input[type="text"], 
+  input[type="email"], 
+  textarea {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  /* ボタンの調整 */
+  .omikuji-button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+  }
+  
+  /* 作品集・書庫のリンクを縦並びに */
+  .work-links a,
+  .book-links a {
+    display: block;
+    margin: 5px 0;
+    text-align: center;
+  }
+  
+  /* マーキーの調整 */
+  .info-bar {
+    font-size: 11px;
+    padding: 3px 0;
+  }
+}
+
+/* 極小画面対応 (320px以下) */
+@media screen and (max-width: 320px) {
+  body {
+    font-size: 14px;
+  }
+  
+  .container {
+    margin: 2px;
+    padding: 8px;
+  }
+  
+  header h1 {
+    font-size: 18px;
+  }
+  
+  .box {
+    padding: 8px;
+  }
+  
+  .box h2 {
+    font-size: 14px;
+    margin: -8px -8px 8px -8px;
+    padding: 4px 8px;
+  }
 }
