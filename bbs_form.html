@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>†BBS 新規投稿†</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>†‡ BBS 新規投稿 ‡†</h1>
+      <p>投稿内容を記入してください。</p>
+    </header>
+
+    <div class="main-wrapper">
+      <main>
+        <div class="box">
+          <h2>■ 新規投稿フォーム</h2>
+          <!-- formにidを付け、actionとmethodは削除 -->
+          <form id="post-form">
+            <table width="100%">
+              <tr>
+                <td width="20%">お名前</td>
+                <td><input type="text" name="name" size="40" value="名無しさん" required></td>
+              </tr>
+               <tr>
+                <td>件名</td>
+                <td><input type="text" name="subject" size="50" value="（無題）" required></td>
+              </tr>
+              <tr>
+                <td valign="top">本文</td>
+                <td><textarea name="message" cols="50" rows="8" required></textarea></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>
+                  <input type="submit" value="書き込む">
+                  <input type="reset" value="リセット">
+                </td>
+              </tr>
+            </table>
+          </form>
+           <!-- 投稿ステータスを表示するエリア -->
+           <p id="status-message" style="font-weight: bold; text-align: center; margin-top: 15px;"></p>
+        </div>
+         <div style="text-align: center; margin-top: 20px;">
+            <a href="bbs.html">BBSに戻る</a>
+        </div>
+      </main>
+
+    </div>
+
+    <footer>
+      <p><small>Copyright &copy; 2001-2025 eightman999 All Rights Reserved.</small></p>
+    </footer>
+  </div>
+
+  <!-- BBS用のJavaScriptを読み込む -->
+  <script src="bbs_script.js"></script>
+
+</body>
+</html>
