@@ -8,13 +8,32 @@ body {
   padding: 0;
   /* サイトの背景色 */
   background-color: #ccccff; /* 薄い紫 */
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABlBMVEUAAAAAAAClg79RAAAAAXRSTlMAQObYZgAAABxJREFUeNpjYBgFo2AUjILhB+gH4wYGBgYGAAA9AAFG+x0+AAAAAElFTkSuQmCC'); /* ドットパターン */
   color: #333333;
+  /* スクロールバーのスタイル */
+  scrollbar-width: thin;
+  scrollbar-color: #99ccff #f0f0f0;
+}
+
+body::-webkit-scrollbar {
+  width: 12px;
+}
+
+body::-webkit-scrollbar-track {
+  background: #f0f0f0;
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: #99ccff;
+  border-radius: 6px;
+  border: 3px solid #f0f0f0;
 }
 
 /* --- リンクのスタイル --- */
 a {
   color: #0000ff; /* 青 */
   text-decoration: underline;
+  transition: color 0.3s ease, text-decoration 0.3s ease;
 }
 a:visited {
   color: #800080; /* 紫 */
@@ -22,6 +41,10 @@ a:visited {
 a:hover {
   color: #ff0000; /* 赤 */
   text-decoration: none;
+  text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+}
+a:active {
+  color: #ffa500; /* オレンジ */
 }
 
 /* --- 全体を囲むコンテナ（レスポンシブ対応） --- */
@@ -33,22 +56,25 @@ a:hover {
   border: 2px solid #000080; /* 濃い青の枠線 */
   padding: 20px;
   box-sizing: border-box; /* paddingを含めて幅計算 */
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3); /* ドロップシャドウ */
 }
 
 /* --- ヘッダー --- */
 header {
-  background-color: #99ccff; /* 水色 */
+  background: linear-gradient(to bottom, #99ccff, #6699ff); /* 水色から青へのグラデーション */
   color: #000066; /* 濃紺 */
   padding: 20px;
   text-align: center;
   border: 1px dashed #000080;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2); /* ドロップシャドウ */
 }
 
 header h1 {
   margin: 0;
-  font-family: 'Times New Roman', serif;
-  font-size: 28px;
+  font-family: 'Impact', 'Arial Black', sans-serif; /* より力強いフォント */
+  font-size: 32px; /* 少し大きく */
   font-weight: bold;
+  text-shadow: 2px 2px 3px rgba(255, 255, 255, 0.5); /* テキストシャドウ */
 }
 
 header p {
@@ -64,6 +90,8 @@ header p {
   font-size: 14px;
   font-weight: bold;
   color: #333;
+  background-color: #ffffcc; /* 背景色を明示 */
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* わずかな凹み効果 */
 }
 
 /* --- メインエリアとサイドバーのレイアウト --- */
@@ -90,15 +118,17 @@ main {
   padding: 25px;
   margin-bottom: 15px;
   border: 1px solid #999999;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1); /* ドロップシャドウ */
 }
 
 .box h2 {
   font-size: 20px;
   color: #000066;
-  background-color: #ddeeff;
+  background: linear-gradient(to right, #ddeeff, #bbddff); /* グラデーション */
   padding: 8px 15px;
   margin: -25px -25px 20px -25px;
   border-bottom: 1px solid #999999;
+  box-shadow: inset 0 -2px 5px rgba(0, 0, 0, 0.1); /* わずかな凹み効果 */
 }
 
 .box ul {
@@ -116,6 +146,7 @@ main {
   border: 1px dashed #666666;
   font-size: 14px;
   margin-bottom: 15px;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1); /* わずかな凹み効果 */
 }
 
 .sidebar-box h3 {
@@ -124,6 +155,7 @@ main {
   margin: 0 0 15px 0;
   text-align: center;
   border-bottom: 1px solid #999;
+  padding-bottom: 5px;
 }
 
 .sidebar-box ul {
@@ -132,7 +164,33 @@ main {
   margin: 0;
 }
 .sidebar-box li {
-  margin-bottom: 10px;
+  margin-bottom: 5px; /* 間隔を少し狭める */
+}
+
+.sidebar-box.menu ul li a {
+  display: block;
+  background-color: #e0e0e0; /* ボタンの背景色 */
+  border: 1px solid #b0b0b0; /* ボタンの枠線 */
+  padding: 8px 15px;
+  text-decoration: none;
+  color: #333333;
+  font-weight: bold;
+  border-radius: 5px; /* 角丸 */
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* ボタンのシャドウ */
+  transition: all 0.2s ease;
+}
+
+.sidebar-box.menu ul li a:hover {
+  background-color: #c0c0c0; /* ホバー時の背景色 */
+  color: #000000;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2); /* ホバー時のシャドウ */
+  transform: translateY(1px); /* わずかに沈む */
+}
+
+.sidebar-box.menu ul li a:active {
+  background-color: #a0a0a0; /* クリック時の背景色 */
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.2); /* 押し込み効果 */
+  transform: translateY(2px);
 }
 
 /* --- フッター --- */
