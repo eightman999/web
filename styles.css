@@ -1,161 +1,171 @@
 /* --- 全体の設定 --- */
 body {
-  /* 当時の定番フォント */
-  font-family: 'MS PGothic', 'ＭＳ Ｐゴシック', sans-serif;
-  font-size: 16px; /* 文字サイズを少し大きく */
-  line-height: 1.7; /* 行間を少し広げる */
+  font-family: Tahoma, 'MS Sans Serif', 'MS Gothic', sans-serif; /* Windows 98風フォント */
+  font-size: 16px;
+  line-height: 1.5;
   margin: 0;
   padding: 0;
-  /* サイトの背景色 */
-  background-color: #ccccff; /* 薄い紫 */
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABlBMVEUAAAAAAAClg79RAAAAAXRSTlMAQObYZgAAABxJREFUeNpjYBgFo2AUjILhB+gH4wYGBgYGAAA9AAFG+x0+AAAAAElFTkSuQmCC'); /* ドットパターン */
-  color: #333333;
-  /* スクロールバーのスタイル */
+  background-color: #E0E0E0; /* シンプルなライトグレー */
+  color: #000000;
+  /* スクロールバーのスタイル (Windows 98風) */
   scrollbar-width: thin;
-  scrollbar-color: #99ccff #f0f0f0;
+  scrollbar-color: #808080 #F0F0F0;
 }
 
 body::-webkit-scrollbar {
-  width: 12px;
+  width: 16px;
+  height: 16px;
 }
 
 body::-webkit-scrollbar-track {
-  background: #f0f0f0;
+  background: #F0F0F0;
+  border: 1px solid #C0C0C0;
 }
 
 body::-webkit-scrollbar-thumb {
-  background-color: #99ccff;
-  border-radius: 6px;
-  border: 3px solid #f0f0f0;
+  background-color: #C0C0C0;
+  border: 1px solid #808080;
+  box-shadow: inset 1px 1px #FFFFFF, inset -1px -1px #808080;
 }
 
 /* --- リンクのスタイル --- */
 a {
-  color: #0000ff; /* 青 */
+  color: #0000FF; /* 標準的な青 */
   text-decoration: underline;
-  transition: color 0.3s ease, text-decoration 0.3s ease;
+  transition: none; /* トランジションを削除 */
 }
 a:visited {
-  color: #800080; /* 紫 */
+  color: #800080; /* 標準的な紫 */
 }
 a:hover {
-  color: #ff0000; /* 赤 */
-  text-decoration: none;
-  text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+  color: #FF0000; /* 標準的な赤 */
+  text-decoration: underline;
+  text-shadow: none; /* テキストシャドウを削除 */
 }
 a:active {
-  color: #ffa500; /* オレンジ */
+  color: #800080; /* クリック時の色 */
 }
 
-/* --- 全体を囲むコンテナ（レスポンシブ対応） --- */
+/* --- 全体を囲むコンテナ --- */
 .container {
-  max-width: 960px; /* 最大幅を設定 */
-  width: 100%; /* 幅を100%に */
+  max-width: 960px;
+  width: 100%;
   margin: 20px auto;
-  background-color: #ffffff;
-  border: 2px solid #000080; /* 濃い青の枠線 */
-  padding: 20px;
-  box-sizing: border-box; /* paddingを含めて幅計算 */
+  background: linear-gradient(to bottom, #F0F0F0, #D0D0D0); /* グラデーション */
+  border-style: solid; /* 3Dボーダーから変更 */
+  border-width: 1px;
+  border-color: #A0A0A0;
+  border-radius: 8px; /* 角丸 */
+  padding: 15px;
+  box-sizing: border-box;
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3); /* ドロップシャドウ */
 }
 
 /* --- ヘッダー --- */
 header {
-  background: linear-gradient(to bottom, #99ccff, #6699ff); /* 水色から青へのグラデーション */
-  color: #000066; /* 濃紺 */
-  padding: 20px;
+  background: linear-gradient(to bottom, #0000CD, #00008B); /* 濃い青のグラデーション */
+  color: #FFFFFF;
+  padding: 10px;
   text-align: center;
-  border: 1px dashed #000080;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2); /* ドロップシャドウ */
+  border: 1px solid #000066;
+  border-radius: 8px 8px 0 0; /* 上部だけ角丸 */
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2); /* ドロップシャドウ */
 }
 
 header h1 {
   margin: 0;
-  font-family: 'Impact', 'Arial Black', sans-serif; /* より力強いフォント */
-  font-size: 32px; /* 少し大きく */
+  font-family: 'MS Sans Serif', Arial, sans-serif; /* システムフォント */
+  font-size: 24px;
   font-weight: bold;
-  text-shadow: 2px 2px 3px rgba(255, 255, 255, 0.5); /* テキストシャドウ */
+  text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.5); /* テキストシャドウ */
 }
 
 header p {
-  margin: 8px 0 0;
-  font-size: 14px;
+  margin: 5px 0 0;
+  font-size: 12px;
 }
 
-/* --- スクロールバー --- */
+/* --- マーキー（情報バー） --- */
 .info-bar {
-  margin-top: 15px;
-  border: 1px solid #666;
-  padding: 5px 0;
-  font-size: 14px;
-  font-weight: bold;
-  color: #333;
-  background-color: #ffffcc; /* 背景色を明示 */
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* わずかな凹み効果 */
+  margin-top: 10px;
+  border: 1px solid #FFCC00; /* 黄色のボーダー */
+  border-radius: 5px; /* 角丸 */
+  padding: 3px 0;
+  font-size: 12px;
+  font-weight: normal;
+  color: #333333;
+  background: linear-gradient(to bottom, #FFFFCC, #FFDD88); /* 黄色のグラデーション */
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2); /* インナーシャドウ */
 }
 
 /* --- メインエリアとサイドバーのレイアウト --- */
 .main-wrapper {
   display: flex;
   margin-top: 15px;
-  gap: 20px;
+  gap: 15px;
 }
 
 /* サイドバーを左側に配置 */
 .sidebar {
   flex: 1;
-  order: 1; /* 左側に表示 */
+  order: 1;
 }
 
 main {
   flex: 3;
-  order: 2; /* 右側に表示 */
+  order: 2;
 }
 
 /* --- 各コンテンツのボックス --- */
 .box {
-  background-color: #ffffff;
-  padding: 25px;
+  background: linear-gradient(to bottom, #FFFFFF, #E0E0E0); /* 白からグレーへのグラデーション */
+  padding: 15px;
   margin-bottom: 15px;
-  border: 1px solid #999999;
-  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1); /* ドロップシャドウ */
+  border: 1px solid #B0B0B0;
+  border-radius: 8px; /* 角丸 */
+  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2); /* ドロップシャドウ */
 }
 
 .box h2 {
-  font-size: 20px;
-  color: #000066;
-  background: linear-gradient(to right, #ddeeff, #bbddff); /* グラデーション */
+  font-size: 18px;
+  color: #FFFFFF;
+  background: linear-gradient(to right, #0066CC, #0099FF); /* 青のグラデーション */
   padding: 8px 15px;
-  margin: -25px -25px 20px -25px;
-  border-bottom: 1px solid #999999;
-  box-shadow: inset 0 -2px 5px rgba(0, 0, 0, 0.1); /* わずかな凹み効果 */
+  margin: -15px -15px 15px -15px;
+  border-bottom: 1px solid #003366;
+  border-radius: 8px 8px 0 0; /* 上部だけ角丸 */
+  box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.3); /* インナーシャドウ */
 }
 
 .box ul {
-  padding-left: 25px;
+  padding-left: 20px;
   margin: 0;
 }
 .box li {
-  margin-bottom: 8px;
+  margin-bottom: 5px;
 }
 
 /* --- サイドバー --- */
 .sidebar-box {
-  background-color: #ffffcc;
-  padding: 15px;
-  border: 1px dashed #666666;
-  font-size: 14px;
+  background: linear-gradient(to bottom, #E0E0E0, #C0C0C0); /* グラデーション */
+  padding: 10px;
+  border: 1px solid #B0B0B0;
+  border-radius: 8px; /* 角丸 */
+  font-size: 12px;
   margin-bottom: 15px;
-  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1); /* わずかな凹み効果 */
+  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2); /* ドロップシャドウ */
 }
 
 .sidebar-box h3 {
-  font-size: 16px;
-  color: #333;
-  margin: 0 0 15px 0;
+  font-size: 14px;
+  color: #FFFFFF;
+  background: linear-gradient(to right, #6699CC, #336699); /* 青のグラデーション */
+  margin: -10px -10px 10px -10px; /* 親要素のpaddingを考慮 */
+  padding: 5px 10px;
   text-align: center;
-  border-bottom: 1px solid #999;
-  padding-bottom: 5px;
+  border-bottom: 1px solid #003366;
+  border-radius: 8px 8px 0 0; /* 上部だけ角丸 */
+  box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.3); /* インナーシャドウ */
 }
 
 .sidebar-box ul {
@@ -164,196 +174,244 @@ main {
   margin: 0;
 }
 .sidebar-box li {
-  margin-bottom: 5px; /* 間隔を少し狭める */
+  margin-bottom: 3px;
 }
 
 .sidebar-box.menu ul li a {
   display: block;
-  background-color: #e0e0e0; /* ボタンの背景色 */
-  border: 1px solid #b0b0b0; /* ボタンの枠線 */
-  padding: 8px 15px;
+  background: linear-gradient(to bottom, #A0A0A0, #808080); /* グラデーション */
+  border: 1px solid #666666;
+  padding: 5px 10px;
   text-decoration: none;
-  color: #333333;
+  color: #FFFFFF;
   font-weight: bold;
   border-radius: 5px; /* 角丸 */
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* ボタンのシャドウ */
-  transition: all 0.2s ease;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); /* ドロップシャドウ */
+  transition: all 0.2s ease; /* ホバーエフェクト用 */
 }
 
 .sidebar-box.menu ul li a:hover {
-  background-color: #c0c0c0; /* ホバー時の背景色 */
-  color: #000000;
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2); /* ホバー時のシャドウ */
-  transform: translateY(1px); /* わずかに沈む */
+  background: linear-gradient(to bottom, #B0B0B0, #909090); /* ホバー時のグラデーション */
+  color: #FFFF00; /* ホバー時の色 */
+  box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.4); /* ホバー時のシャドウ */
+  transform: translateY(-1px); /* わずかに上に移動 */
 }
 
 .sidebar-box.menu ul li a:active {
-  background-color: #a0a0a0; /* クリック時の背景色 */
-  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.2); /* 押し込み効果 */
-  transform: translateY(2px);
+  background: linear-gradient(to bottom, #808080, #A0A0A0); /* クリック時のグラデーション */
+  border-color: #333333;
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5); /* 押し込み効果 */
+  transform: translateY(1px); /* わずかに下に移動 */
 }
 
 /* --- フッター --- */
 footer {
   text-align: center;
-  padding: 15px;
+  padding: 10px;
   margin-top: 15px;
-  border-top: 2px solid #000080;
-  font-size: 12px;
+  border-top: 1px solid #A0A0A0;
+  font-size: 11px;
+  color: #555555;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5); /* テキストシャドウ */
 }
 
 /* --- おみくじ関連のスタイル --- */
 .omikuji-result {
   text-align: center;
-  padding: 20px;
-  background: linear-gradient(45deg, #ffffcc, #ffeeaa);
-  border: 2px solid #cc9900;
-  border-radius: 10px;
-  margin: 20px 0;
+  padding: 15px;
+  background: linear-gradient(to bottom, #E0E0E0, #C0C0C0);
+  border: 1px solid #B0B0B0;
+  border-radius: 8px;
+  margin: 15px 0;
+  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);
 }
 
 .omikuji-fortune {
-  font-size: 24px;
+  font-size: 24px; /* 少し大きく */
   font-weight: bold;
-  color: #cc0000;
+  color: #CC0000; /* 赤色 */
   margin-bottom: 10px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .omikuji-message {
-  font-size: 16px;
+  font-size: 16px; /* 少し大きく */
   margin: 10px 0;
+  color: #333333;
 }
 
 .omikuji-category {
-  background-color: #fff;
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin: 10px 0;
+  background: linear-gradient(to bottom, #FFFFCC, #FFDD88);
+  border: 1px solid #FFCC00;
+  padding: 8px;
+  margin: 8px 0;
   border-radius: 5px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .omikuji-button {
-  background-color: #99ccff;
-  border: 2px solid #000080;
-  padding: 15px 30px;
-  font-size: 18px;
+  background: linear-gradient(to bottom, #00CC00, #009900); /* 緑のグラデーション */
+  border: 1px solid #006600;
+  padding: 12px 25px; /* 少し大きく */
+  font-size: 18px; /* 少し大きく */
   font-weight: bold;
   cursor: pointer;
-  border-radius: 5px;
-  color: #000066;
+  border-radius: 8px;
+  color: #FFFFFF;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
 }
 
 .omikuji-button:hover {
-  background-color: #66aaff;
+  background: linear-gradient(to bottom, #00DD00, #00AA00);
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+  transform: translateY(-1px);
+}
+
+.omikuji-button:active {
+  background: linear-gradient(to bottom, #009900, #00CC00);
+  border-color: #003300;
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
+  transform: translateY(1px);
 }
 
 /* --- 作品集のスタイル --- */
 .work-item {
-  border: 1px solid #ccc;
-  padding: 15px;
-  margin-bottom: 20px;
-  background-color: #f9f9f9;
+  border: 1px solid #B0B0B0;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: linear-gradient(to bottom, #FFFFFF, #E0E0E0);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .work-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
-  color: #000066;
-  margin-bottom: 10px;
+  color: #000080; /* 濃い青 */
+  margin-bottom: 5px;
 }
 
 .work-tech {
-  font-size: 12px;
-  color: #666;
-  margin-bottom: 10px;
+  font-size: 11px;
+  color: #555;
+  margin-bottom: 5px;
 }
 
 .work-links {
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .work-links a {
   display: inline-block;
-  margin-right: 15px;
-  padding: 5px 10px;
-  background-color: #ddeeff;
-  border: 1px solid #999;
+  margin-right: 10px;
+  padding: 5px 12px; /* 少し大きく */
+  background: linear-gradient(to bottom, #66CCFF, #3399FF); /* 青のグラデーション */
+  border: 1px solid #0066CC;
   text-decoration: none;
-  border-radius: 3px;
+  border-radius: 5px;
+  color: #FFFFFF;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.work-links a:hover {
+  background: linear-gradient(to bottom, #3399FF, #66CCFF);
+  box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
 }
 
 /* --- 書庫のスタイル --- */
 .book-item {
-  border: 1px solid #ccc;
-  padding: 15px;
-  margin-bottom: 20px;
-  background-color: #f9f9f9;
+  border: 1px solid #B0B0B0;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: linear-gradient(to bottom, #FFFFFF, #E0E0E0);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .book-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
-  color: #000066;
-  margin-bottom: 5px;
+  color: #000080; /* 濃い青 */
+  margin-bottom: 3px;
 }
 
 .book-author {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 10px;
+  font-size: 12px;
+  color: #555;
+  margin-bottom: 5px;
 }
 
 .book-rating {
-  margin: 10px 0;
+  margin: 5px 0;
 }
 
 .star {
-  color: #ff9900;
-  font-size: 18px;
+  color: #FFD700; /* 金色 */
+  font-size: 16px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .book-links {
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .book-links a {
   display: inline-block;
-  margin-right: 15px;
-  padding: 5px 10px;
-  background-color: #ddeeff;
-  border: 1px solid #999;
+  margin-right: 10px;
+  padding: 5px 12px; /* 少し大きく */
+  background: linear-gradient(to bottom, #66CCFF, #3399FF); /* 青のグラデーション */
+  border: 1px solid #0066CC;
   text-decoration: none;
-  border-radius: 3px;
+  border-radius: 5px;
+  color: #FFFFFF;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.book-links a:hover {
+  background: linear-gradient(to bottom, #3399FF, #66CCFF);
+  box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
 }
 
 /* --- ポエムのスタイル --- */
 .poem-item {
-  background-color: #fff;
-  border: 1px solid #ddd;
-  padding: 20px;
-  margin-bottom: 20px;
-  border-left: 5px solid #99ccff;
+  background: linear-gradient(to bottom, #E0E0E0, #C0C0C0);
+  border: 1px solid #B0B0B0;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-left: 8px solid #FF6600; /* アクセントカラーをオレンジに */
+  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);
 }
 
 .poem-title {
   font-size: 18px;
   font-weight: bold;
-  color: #000066;
-  margin-bottom: 10px;
+  color: #000000;
+  margin-bottom: 8px;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
 }
 
 .poem-content {
-  white-space: pre-line;
+  white-space: pre-wrap;
   font-family: 'MS Mincho', 'ＭＳ 明朝', serif;
-  line-height: 1.8;
-  margin: 15px 0;
+  line-height: 1.6;
+  margin: 10px 0;
+  color: #333333;
 }
 
 .poem-date {
   text-align: right;
   font-size: 12px;
-  color: #666;
-  margin-top: 10px;
+  color: #555;
+  margin-top: 8px;
 }
 
 /* --- テーブルのレスポンシブ対応 --- */
@@ -363,7 +421,24 @@ footer {
 
 table {
   width: 100%;
-  min-width: 500px; /* 最小幅を設定 */
+  min-width: 500px;
+  border-collapse: collapse;
+  border: 1px solid #B0B0B0;
+  border-radius: 8px; /* 角丸 */
+  overflow: hidden; /* 角丸を適用するために必要 */
+  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+table th,
+table td {
+  border: 1px solid #C0C0C0;
+  padding: 8px;
+}
+
+table thead tr {
+  background: linear-gradient(to bottom, #6699CC, #336699); /* 青のグラデーション */
+  color: #FFFFFF;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 /* === レスポンシブ対応（タブレット・スマートフォン） === */
@@ -372,58 +447,7 @@ table {
 @media screen and (max-width: 768px) {
   .container {
     margin: 10px;
-    padding: 15px;
-  }
-  
-  header h1 {
-    font-size: 24px;
-  }
-  
-  header p {
-    font-size: 12px;
-  }
-  
-  .main-wrapper {
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .sidebar {
-    order: 1; /* サイドバーを上に */
-  }
-  
-  main {
-    order: 2; /* メインを下に */
-  }
-  
-  .box {
-    padding: 15px;
-  }
-  
-  .box h2 {
-    font-size: 18px;
-    margin: -15px -15px 15px -15px;
-    padding: 6px 12px;
-  }
-  
-  .sidebar-box {
-    padding: 12px;
-  }
-  
-  .info-bar {
-    font-size: 12px;
-  }
-}
-
-/* スマートフォン対応 (480px以下) */
-@media screen and (max-width: 480px) {
-  .container {
-    margin: 5px;
     padding: 10px;
-  }
-  
-  header {
-    padding: 15px 10px;
   }
   
   header h1 {
@@ -431,30 +455,81 @@ table {
   }
   
   header p {
-    font-size: 11px;
+    font-size: 10px;
+  }
+  
+  .main-wrapper {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .sidebar {
+    order: 1;
+  }
+  
+  main {
+    order: 2;
   }
   
   .box {
-    padding: 12px;
+    padding: 10px;
   }
   
   .box h2 {
     font-size: 16px;
-    margin: -12px -12px 12px -12px;
-    padding: 5px 10px;
+    margin: -10px -10px 10px -10px;
+    padding: 4px 8px;
   }
   
   .sidebar-box {
-    padding: 10px;
+    padding: 8px;
+  }
+  
+  .info-bar {
+    font-size: 10px;
+  }
+}
+
+/* スマートフォン対応 (480px以下) */
+@media screen and (max-width: 480px) {
+  .container {
+    margin: 5px;
+    padding: 8px;
+  }
+  
+  header {
+    padding: 8px;
+  }
+  
+  header h1 {
+    font-size: 18px;
+  }
+  
+  header p {
+    font-size: 9px;
+  }
+  
+  .box {
+    padding: 8px;
+  }
+  
+  .box h2 {
+    font-size: 14px;
+    margin: -8px -8px 8px -8px;
+    padding: 3px 6px;
+  }
+  
+  .sidebar-box {
+    padding: 6px;
   }
   
   .sidebar-box h3 {
-    font-size: 14px;
+    font-size: 12px;
   }
   
   footer {
-    padding: 10px;
-    font-size: 11px;
+    padding: 8px;
+    font-size: 10px;
   }
   
   /* フォーム要素の調整 */
@@ -469,47 +544,47 @@ table {
   /* ボタンの調整 */
   .omikuji-button {
     width: 100%;
-    padding: 12px;
-    font-size: 16px;
+    padding: 8px;
+    font-size: 14px;
   }
   
   /* 作品集・書庫のリンクを縦並びに */
   .work-links a,
   .book-links a {
     display: block;
-    margin: 5px 0;
+    margin: 3px 0;
     text-align: center;
   }
   
   /* マーキーの調整 */
   .info-bar {
-    font-size: 11px;
-    padding: 3px 0;
+    font-size: 9px;
+    padding: 2px 0;
   }
 }
 
 /* 極小画面対応 (320px以下) */
 @media screen and (max-width: 320px) {
   body {
-    font-size: 14px;
+    font-size: 12px;
   }
   
   .container {
-    margin: 2px;
-    padding: 8px;
+    margin: 1px;
+    padding: 5px;
   }
   
   header h1 {
-    font-size: 18px;
+    font-size: 16px;
   }
   
   .box {
-    padding: 8px;
+    padding: 5px;
   }
   
   .box h2 {
-    font-size: 14px;
-    margin: -8px -8px 8px -8px;
-    padding: 4px 8px;
+    font-size: 12px;
+    margin: -5px -5px 5px -5px;
+    padding: 2px 4px;
   }
 }
