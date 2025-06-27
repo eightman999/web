@@ -82,6 +82,281 @@ read(melody);</textarea>
           </div>
         </div>
 
+        <div class="box">
+          <h2>■ Uzume Language Compiler - 使い方説明</h2>
+
+          
+
+          <h3>📖 言語仕様</h3>
+          <h4>グローバル設定</h4>
+          <pre><code class="language-uzume">set tempo(120);        // BPM (beats per minute)
+set beat(4/4);         // 拍子 (time signature)
+set volume(80);        // 音量 (0-127)
+set wave(sine);        // 波形: sine, square, triangle, sawtooth
+</code></pre>
+
+          <h4>小節定義</h4>
+          <pre><code class="language-uzume">// 基本的な音符
+intro = measure[nC4-1, nD4-1, nE4-2];
+
+// 和音
+harmony = measure[[nC4-2, nE4-2, nG4-2]];
+
+// コード記法
+progression = measure[[code(Cmaj7)], [code(F)], [code(G)], [code(Am)]];
+
+// 休符
+rest_measure = measure[nC4-1, R-1, nD4-2];
+</code></pre>
+
+          <h4>音符記法</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>記法</th>
+                <th>説明</th>
+                <th>例</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>nC4-1</code></td>
+                <td>n+音名+オクターブ-拍数</td>
+                <td>C4の1拍</td>
+              </tr>
+              <tr>
+                <td><code>nD#3-2</code></td>
+                <td>シャープ付き</td>
+                <td>D♯3の2拍</td>
+              </tr>
+              <tr>
+                <td><code>nBb4-0.5</code></td>
+                <td>フラット付き</td>
+                <td>B♭4の0.5拍</td>
+              </tr>
+              <tr>
+                <td><code>R-1</code></td>
+                <td>休符</td>
+                <td>1拍の休符</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h4>表情記号</h4>
+          <pre><code class="language-uzume">// 直接指定
+staccato_measure = measure[stc nC4-1, leg nD4-1];
+
+// 後付け指定
+add stc(intro[0]);     // introの1番目の音にスタッカート
+add leg(intro[1]);     // introの2番目の音にレガート
+add acc(intro[2]);     // introの3番目の音にアクセント
+add ten(intro[3]);     // introの4番目の音にテヌート
+</code></pre>
+
+          <table>
+            <thead>
+              <tr>
+                <th>記号</th>
+                <th>名称</th>
+                <th>効果</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>stc</code></td>
+                <td>Staccato</td>
+                <td>音を短く切る</td>
+              </tr>
+              <tr>
+                <td><code>leg</code></td>
+                <td>Legato</td>
+                <td>なめらかに</td>
+              </tr>
+              <tr>
+                <td><code>acc</code></td>
+                <td>Accent</td>
+                <td>強調する</td>
+              </tr>
+              <tr>
+                <td><code>ten</code></td>
+                <td>Tenuto</td>
+                <td>音価を保持</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h4>同時演奏</h4>
+          <pre><code class="language-uzume">// 複数の小節を同時に演奏
+read(melody & bass);                    // 2声部
+read(melody & harmony & bass);          // 3声部
+read(lead & rhythm & bass & drums);     // 4声部
+
+// ループ内での同時演奏
+loop 4 {
+    read(verse & chorus);
+}
+</code></pre>
+
+          <h4>繰り返し</h4>
+          <pre><code class="language-uzume">// 基本的な繰り返し
+loop 2 {
+    read(intro);
+    read(verse);
+}
+
+// ネストした繰り返し
+loop 3 {
+    read(intro);
+    loop 2 {
+        read(verse & bass);
+    }
+    read(outro);
+}
+</code></pre>
+
+          <h4>コード定義</h4>
+          <h5>組み込みコード</h5>
+          <p>Uzumeは全12キーにわたって230以上のコード定義をサポートしています：</p>
+
+          <h6>基本的なコード (C キー例):</h6>
+          <table>
+            <thead>
+              <tr>
+                <th>コード</th>
+                <th>構成音</th>
+                <th>説明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>C</code></td>
+                <td>C4-E4-G4</td>
+                <td>メジャートライアド</td>
+              </tr>
+              <tr>
+                <td><code>Cm</code></td>
+                <td>C4-Eb4-G4</td>
+                <td>マイナートライアド</td>
+              </tr>
+              <tr>
+                <td><code>C7</code></td>
+                <td>C4-E4-G4-Bb4</td>
+                <td>ドミナント7th</td>
+              </tr>
+              <tr>
+                <td><code>Cmaj7</code></td>
+                <td>C4-E4-G4-B4</td>
+                <td>メジャー7th</td>
+              </tr>
+              <tr>
+                <td><code>Cm7</code></td>
+                <td>C4-Eb4-G4-Bb4</td>
+                <td>マイナー7th</td>
+              </tr>
+              <tr>
+                <td><code>Cdim</code></td>
+                <td>C4-Eb4-F#4</td>
+                <td>ディミニッシュ</td>
+              </tr>
+              <tr>
+                <td><code>Caug</code></td>
+                <td>C4-E4-G#4</td>
+                <td>オーギュメント</td>
+              </tr>
+              <tr>
+                <td><code>Csus4</code></td>
+                <td>C4-F4-G4</td>
+                <td>サスペンデッド4th</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h6>拡張コード (C キー例):</h6>
+          <table>
+            <thead>
+              <tr>
+                <th>コード</th>
+                <th>構成音</th>
+                <th>説明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>Cadd9</code></td>
+                <td>C4-E4-G4-D5</td>
+                <td>アド9th</td>
+              </tr>
+              <tr>
+                <td><code>C9</code></td>
+                <td>C4-E4-G4-Bb4-D5</td>
+                <td>ナインス</td>
+              </tr>
+              <tr>
+                <td><code>C11</code></td>
+                <td>C4-E4-G4-Bb4-D5-F5</td>
+                <td>イレブンス</td>
+              </tr>
+              <tr>
+                <td><code>C13</code></td>
+                <td>C4-E4-G4-Bb4-D5-F5-A5</td>
+                <td>サーティーンス</td>
+              </tr>
+              <tr>
+                <td><code>Cmaj9</code></td>
+                <td>C4-E4-G4-B4-D5</td>
+                <td>メジャー9th</td>
+              </tr>
+              <tr>
+                <td><code>C7-b9</code></td>
+                <td>C4-E4-G4-Bb4-C#5</td>
+                <td>7thフラット9</td>
+              </tr>
+              <tr>
+                <td><code>C7-#9</code></td>
+                <td>C4-E4-G4-Bb4-Eb5</td>
+                <td>7thシャープ9</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h6>省略コード (C キー例):</h6>
+          <table>
+            <thead>
+              <tr>
+                <th>コード</th>
+                <th>構成音</th>
+                <th>説明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>Cno3</code></td>
+                <td>C4-G4</td>
+                <td>3度なし</td>
+              </tr>
+              <tr>
+                <td><code>Cno5</code></td>
+                <td>C4-E4</td>
+                <td>5度なし</td>
+              </tr>
+              <tr>
+                <td><code>Cmaj7-no5</code></td>
+                <td>C4-E4-B4</td>
+                <td>メジャー7th 5度なし</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p><strong>対応キー:</strong> C, C#, D, Eb, E, F, F#, G, G#, A, Bb, B（全12キー）</p>
+          <p><strong>利用可能なコードタイプ:</strong> メジャー、マイナー、7th、maj7、m7、dim、aug、sus4、add9、9、11、13、m9、maj9、7-b9、7-#9、no3、no5、maj7-no5</p>
+
+          <h5>コード使用例</h5>
+          <pre><code class="language-uzume">// コードチョードの使用（拍数はcode()外で指定）
+chord_progression = measure [[code(C)-1], [code(Am)-1], [code(F)-1], [code(G)-1]];
+read(chord_progression);
+</code></pre>
+        </div>
+
         <div style="text-align: center; margin-top: 20px;">
           <a href="index.html">トップページに戻る</a>
         </div>
@@ -105,7 +380,7 @@ read(melody);</textarea>
 
         dynamics: `// Dynamics and articulation example\nset tempo(90);\nset beat(4/4);\nset wave(sine);\nset volume(80);\n\ncrescendo = measure.cre [nC4-1, nD4-1, nE4-1, nF4-1];\nforte_notes = measure [nG4-1^f, nA4-1^ff, nG4-1^f, nF4-1^mf];\nstaccato = measure [stc nC5-0.5, stc nD5-0.5, leg nE5-2];\n\nread(crescendo);\nread(forte_notes);\nread(staccato);`,
 
-        hotaru: `\n\nset tempo(88);\nset beat(4 / 4);\n\ntrack melody {\n    set wave(chiptune);\n    set volume(85);\n\n\n    m0 = measure [nC4-1];\n\n    m1  = measure [nF4-1.5, nF4-0.5, nF4-1,  nA4-1];\n    m2  = measure [nG4-1.5, nF4-0.5, nG4-1,  nA4-1];\n    m3  = measure [nF4-1.5, nF4-0.5, nA4-1,  nC5-1];\n    m4  = measure [nD5-3,   nD5-1];\n    m5  = measure [nC5-1.5, nA4-0.5, nA4-1,  nF4-1];\n    m6  = measure [nG4-1.5, nF4-0.5, nG4-1,  nA4-1];\n    m7  = measure [nF4-1.5, nD4-0.5, nD4-1,  nC4-1];\n    m8  = measure [nF4-3,   nD5-1];\n    m9  = measure [nC5-1.5, nA4-0.5, nA4-1,  nF4-1];\n    m10 = measure [nG4-1.5, nF4-0.5, nG4-1,  nD5-1];\n    m11 = measure [nC5-1.5, nA4-0.5, nA4-1,  nC5-1];\n    m12 = measure [nD5-3,   nD5-1];\n    m13 = measure [nC5-1.5, nA4-0.5, nA4-1,  nF4-1];\n    m14 = measure [nG4-1.5, nF4-0.5, nG4-1,  nA4-1];\n    m15 = measure [nF4-1.5, nD4-0.5, nD4-1,  nC4-1];\n    m16 = measure [nF4-3,   R-1];\n\n\n    add leg(m0[0]);\n    add leg(m1[0]);\n    add leg(m8[0]);\n    add leg(m16[0]);\n\n\n    read(m0); read(m1); read(m2); read(m3); read(m4);\n    read(m5); read(m6); read(m7); read(m8); read(m9);\n    read(m10); read(m11); read(m12); read(m13); read(m14);\n    read(m15); read(m16);\n}\n\ntrack chords {\n    set wave(triangle);\n    set volume(50);\n\n\n    c0 = measure [[code(F)-1]];\n\n    c1  = measure [[code(F)-4]];\n    c2  = measure [[code(C7)-4]];\n    c3  = measure [[code(F)-2], [code(Am)-2]];\n    c4  = measure [[code(Bb)-2], [code(C7)-2]];\n    c5  = measure [[code(F)-4]];\n    c6  = measure [[code(C7)-4]];\n    c7  = measure [[code(Dm)-2], [code(Gm)-2]];\n    c8  = measure [[code(F)-3], [code(Bb)-1]];\n    c9  = measure [[code(F)-2], [code(Am)-2]];\n    c10 = measure [[code(C7)-2], [code(Bb)-2]];\n    c11 = measure [[code(F)-2], [code(Am)-2]];\n    c12 = measure [[code(Bb)-2], [code(C7)-2]];\n    c13 = measure [[code(F)-4]];\n    c14 = measure [[code(C7)-4]];\n    c15 = measure [[code(Dm)-2], [code(Gm)-2]];\n    c16 = measure [[code(F)-3], R-1];\n\n    read(c0); read(c1); read(c2); read(c3); read(c4);\n    read(c5); read(c6); read(c7); read(c8); read(c9);\n    read(c10); read(c11); read(c12); read(c13); read(c14);\n    read(c15); read(c16);\n}\ntrack bass {\n    set wave(chiptune);\n    set volume(70);\n\n\n    b0 = measure [nF2-1];\n\n\n    b1  = measure [nF2-2, nF3-1, nF2-1];\n    b2  = measure [nC3-2, nC3-1, nC2-1];\n    b3  = measure [nF2-2, nA2-2];\n    b4  = measure [nBb2-2, nC3-2];\n    b5  = measure [nF2-2, nF3-1, nF2-1];\n    b6  = measure [nC3-2, nC3-1, nC2-1];\n    b7  = measure [nD3-2, nG2-2];\n    b8  = measure [nF2-3, nBb2-1];\n    b9  = measure [nF2-2, nA2-2];\n    b10 = measure [nC3-2, nBb2-2];\n    b11 = measure [nF2-2, nA2-2];\n    b12 = measure [nBb2-2, nC7-2];\n    b13 = measure [nF2-4];\n    b14 = measure [nC3-4];\n    b15 = measure [nD3-2, nG2-2];\n    b16 = measure [nF2-3, R-1];\n\n\n    read(b0); read(b1); read(b2); read(b3); read(b4);\n    read(b5); read(b6); read(b7); read(b8); read(b9);\n    read(b10); read(b11); read(b12); read(b13); read(b14);\n    read(b15); read(b16);\n}`
+        hotaru: `\n\nset tempo(88);\nset beat(4 / 4);\n\ntrack melody {\n    set wave(chiptune);\n    set volume(85);\n\n\n    m0 = measure [nC4-1];\n\n    m1  = measure [nF4-1.5, nF4-0.5, nF4-1,  nA4-1];\n    m2  = measure [nG4-1.5, nF4-0.5, nG4-1,  nA4-1];\n    m3  = measure [nF4-1.5, nF4-0.5, nA4-1,  nC5-1];\n    m4  = measure [nD5-3,   nD5-1];\n    m5  = measure [nC5-1.5, nA4-0.5, nA4-1,  nF4-1];\n    m6  = measure [nG4-1.5, nF4-0.5, nG4-1,  nA4-1];\n    m7  = measure [nF4-1.5, nD4-0.5, nD4-1,  nC4-1];\n    m8  = measure [nF4-3,   nD5-1];\n    m9  = measure [nC5-1.5, nA4-0.5, nA4-1,  nF4-1];\n    m10 = measure [nG4-1.5, nF4-0.5, nG4-1,  nD5-1];\n    m11 = measure [nC5-1.5, nA4-0.5, nA4-1,  nC5-1];\n    m12 = measure [nD5-3,   nD5-1];\n    m13 = measure [nC5-1.5, nA4-0.5, nA4-1,  nF4-1];\n    m14 = measure [nG4-1.5, nF4-0.5, nG4-1,  nA4-1];\n    m15 = measure [nF4-1.5, nD4-0.5, nD4-1,  nC4-1];\n    m16 = measure [nF4-3,   R-1];\n\n\n    add leg(m0[0]);\n    add leg(m1[0]);\n    add leg(m8[0]);\n    add leg(m16[0]);\n\n\n    read(m0); read(m1); read(m2); read(m3); read(m4);\n    read(m5); read(m6); read(m7); read(m8); read(m9);\n    read(m10); read(m11); read(m12); read(m13); read(m14);\n    read(m15); read(m16);\n}\n\ntrack chords {\n    set wave(triangle);\n    set volume(50);\n\n\n    c0 = measure [[code(F)-1]];\n\n    c1  = measure [[code(F)-4]];\n    c2  = measure [[code(C7)-4]];\n    c3  = measure [[code(F)-2], [code(Am)-2]];\n    c4  = measure [[code(Bb)-2], [code(C7)-2]];\n    c5  = measure [[code(F)-4]];\n    c6  = measure [[code(C7)-4]];\n    c7  = measure [[code(Dm)-2], [code(Gm)-2]];\n    c8  = measure [[code(F)-3], [code(Bb)-1]];\n    c9  = measure [[code(F)-2], [code(Am)-2]];\n    c10 = measure [[code(C7)-2], [code(Bb)-2]];\n    c11 = measure [[code(F)-2], [code(Am)-2]];\n    c12 = measure [[code(Bb)-2], [code(C7)-2]];\n    c13 = measure [[code(F)-4]];\n    c14 = measure [[code(C7)-4]];\n    c15 = measure [[code(Dm)-2], [code(Gm)-2]];\n    c16 = measure [[code(F)-3], R-1];\n\n    read(c0); read(c1); read(c2); read(c3); read(c4);\n    read(c5); read(c6); read(c7); read(c8); read(c9);\n    read(c10); read(c11); read(c12); read(c13); read(c14);\n    read(c15); read(c16);\n}\ntrack bass {\n    set wave(chiptune);\n    set volume(70);\n\n\n    b0 = measure [nF2-1];\n\n\n    b1  = measure [nF2-2, nF3-1, nF2-1];\n    b2  = measure [nC3-2, nC3-1, nC2-1];\n    b3  = measure [nF2-2, nA2-2];\n    b4  = measure [nBb2-2, nC3-2];\n    b5  = measure [nF2-2, nF3-1, nF2-1];\n    b6  = measure [nC3-2, nC3-1, nC2-1];\n    b7  = measure [nD3-2, nG2-2];\n    b8  = measure [nF2-3, nBb2-1];\n    b9  = measure [nF2-2, nA2-2];\n    b10 = measure [nC3-2, nBb2-2];\n    b11 = measure [nF2-2, nA2-2];\n    b12 = measure [nBb2-2, nC2-2];\n    b13 = measure [nF2-4];\n    b14 = measure [nC3-4];\n    b15 = measure [nD3-2, nG2-2];\n    b16 = measure [nF2-3, R-1];\n\n\n    read(b0); read(b1); read(b2); read(b3); read(b4);\n    read(b5); read(b6); read(b7); read(b8); read(b9);\n    read(b10); read(b11); read(b12); read(b13); read(b14);\n    read(b15); read(b16);\n}`
     };
 
     // Global variables
