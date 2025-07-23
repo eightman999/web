@@ -1,0 +1,47 @@
+body {
+    font-family: Tahoma, 'MS Sans Serif', sans-serif;
+    background: #3a6ea5;
+    margin: 0;
+    padding: 0;
+    color: #000;
+}
+
+#windowsXP {
+    margin-top: 20px;
+}
+
+#window {
+    width: 400px;
+    margin: 100px auto;
+    background: #e8e8e8;
+    border: 2px solid #000080;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.title-bar {
+    background: linear-gradient(#3a6ea5, #2b5797);
+    color: #fff;
+    padding: 4px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+.title-bar .title {
+    flex: 1;
+}
+
+.window-body {
+    padding: 10px;
+}
+
+button {
+    font-family: inherit;
+    border: 1px solid #000080;
+    background: #dfe9f5;
+    padding: 4px 8px;
+}
+
+button:active {
+    background: #adc7ea;
+}
