@@ -1,0 +1,46 @@
+body {
+  background: #fff;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.google-container {
+  margin-top: 15%;
+}
+
+.logo {
+  font-size: 72px;
+  color: #4285F4;
+  font-weight: bold;
+  font-family: 'Product Sans', sans-serif;
+  margin-bottom: 20px;
+}
+
+#searchInput {
+  width: 60%;
+  padding: 10px;
+  border: 1px solid #dcdcdc;
+  border-radius: 24px;
+  font-size: 16px;
+}
+
+.buttons {
+  margin-top: 20px;
+}
+
+.buttons input,
+.buttons button {
+  margin: 0 4px;
+  padding: 8px 16px;
+  background: #f8f9fa;
+  border: 1px solid #f8f9fa;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.buttons input:hover,
+.buttons button:hover {
+  border: 1px solid #c6c6c6;
+}
