@@ -1,0 +1,21 @@
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(#1c3d5a, #2d5d88) fixed;
+  color: #ffffff;
+}
+
+#vista-window {
+  width: 600px;
+  margin: 100px auto;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+}
+
+#vista-title {
+  margin-top: 0;
+  font-size: 24px;
+}
