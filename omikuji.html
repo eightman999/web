@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="styles.css">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6773256815988241"
      crossorigin="anonymous"></script>
+  <!-- defer属性を追加して、HTMLの解析をブロックしないようにしています -->
+  <script src="omikuji_script.js" defer></script>
 </head>
 <body>
 
@@ -23,62 +25,81 @@
 
     <div class="main-wrapper">
       <aside class="sidebar">
-        <div class="sidebar-box menu">
-          <h3>* M E N U *</h3>
-          <ul>
-            <li><a href="index.html">トップ</a></li>
-            <li><a href="quotes.html">好きな言葉</a></li>
-            <li><a href="omikuji.html">今日のおみくじ</a></li>
-            <li><a href="works.html">作品集</a></li>
-            <li><a href="library.html">書庫</a></li>
-            <li><a href="poem.html">ポエム</a></li>
-            <li><a href="bbs.html">BBS</a></li>
-            <li><a href="link.html">LINK</a></li>
+        <div class="sidebar-box">
+          <h2>メニュー</h2>
+          <ul class="menu">
+            <li><a href="index.html">トップページ</a></li>
+            <li><a href="diary.html">日記</a></li>
+            <li><a href="bbs.html">掲示板</a></li>
+            <li><a href="links.html">リンク集</a></li>
+            <li><a href="omikuji.html">おみくじ</a></li>
           </ul>
         </div>
+        <div class="sidebar-box">
+          <h2>プロフィール</h2>
+          <p>eightman999<br>インターネットの片隅でひっそり暮らしています。</p>
+        </div>
       </aside>
-
+      
       <main>
+        <!-- おみくじを引くセクション -->
         <div class="box">
-          <h2>■ おみくじを引く</h2>
-          <div style="text-align: center;">
-            <button id="omikuji-button" class="omikuji-button">おみくじを引く</button>
+          <h2>† おみくじを引く †</h2>
+          <div class="form-group">
+              <label for="draw-jinjya-select">神社を選ぶ</label>
+              <select id="draw-jinjya-select">
+                <option value="">すべての神社から</option>
+                <!-- JavaScriptによって動的に神社が追加されます -->
+              </select>
           </div>
+          <p style="text-align: center;">
+            <button id="omikuji-button" class="omikuji-button">今日の運勢を占う</button>
+          </p>
           
-          <div id="omikuji-result" style="display: none;">
-            <div class="omikuji-result">
+          <!-- おみくじ結果表示エリア -->
+          <div id="omikuji-result" style="display: none; margin-top: 20px;">
+            <div class="omikuji-paper">
+              <div id="result-jinjya-name" class="omikuji-jinjya"></div>
               <div class="omikuji-fortune" id="omikuji-fortune"></div>
               <div class="omikuji-message" id="omikuji-message"></div>
-              
-              <div class="omikuji-category">
-                <strong>恋愛運:</strong> <span id="omikuji-love"></span>
-              </div>
-              
-              <div class="omikuji-category">
-                <strong>仕事運:</strong> <span id="omikuji-work"></span>
-              </div>
-              
-              <div class="omikuji-category">
-                <strong>健康運:</strong> <span id="omikuji-health"></span>
-              </div>
-              
-              <div class="omikuji-category">
-                <strong>金運:</strong> <span id="omikuji-money"></span>
-              </div>
-              
-              <div class="omikuji-category">
-                <strong>学習運:</strong> <span id="omikuji-study"></span>
-              </div>
+              <!-- 動的にタグが挿入されるコンテナ -->
+              <div id="omikuji-tags-container"></div>
             </div>
           </div>
           
           <div id="omikuji-status" style="text-align: center; margin-top: 20px; font-weight: bold;"></div>
         </div>
 
+        <!-- おみくじを奉納するセクション -->
         <div class="box">
-          <h2>■ 使い方</h2>
-          <p>上のボタンを押すと、今日のあなたの運勢を占うことができます。</p>
-          <p>1日1回、同じ結果が表示されます。明日になったら新しい運勢を占えます。</p>
+          <h2>† おみくじを奉納する †</h2>
+          <p>自分でおみくじを作って奉納できます。奉納されたおみくじは、他の誰かが引くことになります。</p>
+          <form id="submit-form" class="omikuji-form">
+            <div class="form-group">
+              <label for="submit-jinjya-select">奉納先の神社を選ぶ</label>
+              <select id="submit-jinjya-select" required>
+                <option value="" disabled selected>神社を選択してください</option>
+                <!-- JavaScriptによって動的に神社が追加されます -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="fortune-input">運勢 (例: 大吉, 凶)</label>
+              <input type="text" id="fortune-input" required>
+            </div>
+            <div class="form-group">
+              <label for="message-input">メッセージ</label>
+              <textarea id="message-input" rows="3" required></textarea>
+            </div>
+            <fieldset id="tags-fieldset">
+              <legend>詳細な運勢 (tags)</legend>
+              <!-- JavaScriptによって動的にフォームが生成されます -->
+              <div id="tags-input-container"></div>
+            </fieldset>
+            <div style="text-align: center; margin-top: 20px;">
+                <button type="submit" id="submit-button" class="omikuji-button">奉納する</button>
+            </div>
+          </form>
+          <div id="submit-status" style="text-align: center; margin-top: 20px; font-weight: bold;"></div>
         </div>
 
         <div style="text-align: center; margin-top: 20px;">
@@ -88,11 +109,9 @@
     </div>
 
     <footer>
-      <p><small>Copyright &copy; 2001-2025 eightman999 All Rights Reserved.<br>サイト開設日: 2001年1月1日 / 最終更新日: 2025年6月26日</small></p>
+      <p><small>Copyright &copy; 2001-2025 eightman999 All Rights Reserved.<br>
+      このサイトはFICTIONです。実在の人物・団体とは一切関係ありません。</small></p>
     </footer>
   </div>
-
-  <script src="omikuji_script.js"></script>
-
 </body>
 </html>
