@@ -81,6 +81,7 @@ read(melody);</textarea>
             <button class="omikuji-button example-btn" data-example="multitrack">マルチトラック</button>
             <button class="omikuji-button example-btn" data-example="dynamics">強弱とアーティキュレーション</button>
             <button class="omikuji-button example-btn" data-example="hotaru">蛍の光</button>
+            <button class="omikuji-button example-btn" data-example="daisy">デイジー・ベル</button>
             <button class="omikuji-button example-btn" data-example="newfeatures">新機能デモ</button>
           </div>
         </div>
@@ -383,8 +384,391 @@ read(chord_progression);
 
         dynamics: `// Dynamics and articulation example\nset tempo(90);\nset beat(4/4);\nset wave(sine);\nset volume(80);\n\ncrescendo = measure.cre [nC4-1, nD4-1, nE4-1, nF4-1];\nforte_notes = measure [nG4-1^f, nA4-1^ff, nG4-1^f, nF4-1^mf];\nstaccato = measure [stc nC5-0.5, stc nD5-0.5, leg nE5-2];\n\nread(crescendo);\nread(forte_notes);\nread(staccato);`,
 
-        hotaru: `\n\nset tempo(88);\nset beat(4 / 4);\n\ntrack melody {\n    set wave(chiptune);\n    set volume(85);\n\n\n    m0 = measure [nC4-1];\n\n    m1  = measure [nF4-1.5, nF4-0.5, nF4-1,  nA4-1];\n    m2  = measure [nG4-1.5, nF4-0.5, nG4-1,  nA4-1];\n    m3  = measure [nF4-1.5, nF4-0.5, nA4-1,  nC5-1];\n    m4  = measure [nD5-3,   nD5-1];\n    m5  = measure [nC5-1.5, nA4-0.5, nA4-1,  nF4-1];\n    m6  = measure [nG4-1.5, nF4-0.5, nG4-1,  nA4-1];\n    m7  = measure [nF4-1.5, nD4-0.5, nD4-1,  nC4-1];\n    m8  = measure [nF4-3,   nD5-1];\n    m9  = measure [nC5-1.5, nA4-0.5, nA4-1,  nF4-1];\n    m10 = measure [nG4-1.5, nF4-0.5, nG4-1,  nD5-1];\n    m11 = measure [nC5-1.5, nA4-0.5, nA4-1,  nC5-1];\n    m12 = measure [nD5-3,   nD5-1];\n    m13 = measure [nC5-1.5, nA4-0.5, nA4-1,  nF4-1];\n    m14 = measure [nG4-1.5, nF4-0.5, nG4-1,  nA4-1];\n    m15 = measure [nF4-1.5, nD4-0.5, nD4-1,  nC4-1];\n    m16 = measure [nF4-3,   R-1];\n\n\n    add leg(m0[0]);\n    add leg(m1[0]);\n    add leg(m8[0]);\n    add leg(m16[0]);\n\n\n    read(m0); read(m1); read(m2); read(m3); read(m4);\n    read(m5); read(m6); read(m7); read(m8); read(m9);\n    read(m10); read(m11); read(m12); read(m13); read(m14);\n    read(m15); read(m16);\n}\n\ntrack chords {\n    set wave(triangle);\n    set volume(50);\n\n\n    c0 = measure [[code(F)-1]];\n\n    c1  = measure [[code(F)-4]];\n    c2  = measure [[code(C7)-4]];\n    c3  = measure [[code(F)-2], [code(Am)-2]];\n    c4  = measure [[code(Bb)-2], [code(C7)-2]];\n    c5  = measure [[code(F)-4]];\n    c6  = measure [[code(C7)-4]];\n    c7  = measure [[code(Dm)-2], [code(Gm)-2]];\n    c8  = measure [[code(F)-3], [code(Bb)-1]];\n    c9  = measure [[code(F)-2], [code(Am)-2]];\n    c10 = measure [[code(C7)-2], [code(Bb)-2]];\n    c11 = measure [[code(F)-2], [code(Am)-2]];\n    c12 = measure [[code(Bb)-2], [code(C7)-2]];\n    c13 = measure [[code(F)-4]];\n    c14 = measure [[code(C7)-4]];\n    c15 = measure [[code(Dm)-2], [code(Gm)-2]];\n    c16 = measure [[code(F)-3], R-1];\n\n    read(c0); read(c1); read(c2); read(c3); read(c4);\n    read(c5); read(c6); read(c7); read(c8); read(c9);\n    read(c10); read(c11); read(c12); read(c13); read(c14);\n    read(c15); read(c16);\n}\ntrack bass {\n    set wave(chiptune);\n    set volume(70);\n\n\n    b0 = measure [nF2-1];\n\n\n    b1  = measure [nF2-2, nF3-1, nF2-1];\n    b2  = measure [nC3-2, nC3-1, nC2-1];\n    b3  = measure [nF2-2, nA2-2];\n    b4  = measure [nBb2-2, nC3-2];\n    b5  = measure [nF2-2, nF3-1, nF2-1];\n    b6  = measure [nC3-2, nC3-1, nC2-1];\n    b7  = measure [nD3-2, nG2-2];\n    b8  = measure [nF2-3, nBb2-1];\n    b9  = measure [nF2-2, nA2-2];\n    b10 = measure [nC3-2, nBb2-2];\n    b11 = measure [nF2-2, nA2-2];\n    b12 = measure [nBb2-2, nC2-2];\n    b13 = measure [nF2-4];\n    b14 = measure [nC3-4];\n    b15 = measure [nD3-2, nG2-2];\n    b16 = measure [nF2-3, R-1];\n\n\n    read(b0); read(b1); read(b2); read(b3); read(b4);\n    read(b5); read(b6); read(b7); read(b8); read(b9);\n    read(b10); read(b11); read(b12); read(b13); read(b14);\n    read(b15); read(b16);\n}`
-        newfeatures: `// v0.5.1 新機能デモ\n// 1) nなし音名記法  2) pulse50波形  3) .arpeggio  4) カスタムコード  5) スケール度数\nset tempo(110);\nset beat(4/4);\n\n// カスタムコード定義 (Name = chord [...])\nMyCmaj9 = chord [C4, E4, G4, B4, D5];\n\n// pulse50 波形 + nなし音名 + 動的記号\ntrack pulse_lead {\n    set wave(pulse50);\n    set volume(80);\n    melody = measure [C5-1^mf, E5-1^f, G5-2^ff, R-2];\n    cresc = measure.cre [C5-1, D5-1, E5-1, G5-1];\n    read(melody);\n    read(cresc);\n}\n\n// スケール度数記法 (set scale + 1_4-1 形式)\ntrack scale_lead {\n    set wave(triangle);\n    set volume(65);\n    set scale(major);\n    scale_run = measure [1_5-1, 2_5-1, 3_5-0.5, 4_5-0.5, 5_5-2];\n    read(scale_run);\n    read(scale_run);\n}\n\n// アルペジオ伴奏 (measure.arpeggio + カスタムコード)\ntrack arp_backing {\n    set wave(sine);\n    set volume(50);\n    arp = measure.arpeggio [[code(MyCmaj9)-2], [code(Am)-2]];\n    read(arp);\n    read(arp);\n}`
+        hotaru: `\n\nset tempo(88);\nset beat(4 / 4);\n\ntrack melody {\n    set wave(chiptune);\n    set volume(85);\n\n\n    m0 = measure [nC4-1];\n\n    m1  = measure [nF4-1.5, nF4-0.5, nF4-1,  nA4-1];\n    m2  = measure [nG4-1.5, nF4-0.5, nG4-1,  nA4-1];\n    m3  = measure [nF4-1.5, nF4-0.5, nA4-1,  nC5-1];\n    m4  = measure [nD5-3,   nD5-1];\n    m5  = measure [nC5-1.5, nA4-0.5, nA4-1,  nF4-1];\n    m6  = measure [nG4-1.5, nF4-0.5, nG4-1,  nA4-1];\n    m7  = measure [nF4-1.5, nD4-0.5, nD4-1,  nC4-1];\n    m8  = measure [nF4-3,   nD5-1];\n    m9  = measure [nC5-1.5, nA4-0.5, nA4-1,  nF4-1];\n    m10 = measure [nG4-1.5, nF4-0.5, nG4-1,  nD5-1];\n    m11 = measure [nC5-1.5, nA4-0.5, nA4-1,  nC5-1];\n    m12 = measure [nD5-3,   nD5-1];\n    m13 = measure [nC5-1.5, nA4-0.5, nA4-1,  nF4-1];\n    m14 = measure [nG4-1.5, nF4-0.5, nG4-1,  nA4-1];\n    m15 = measure [nF4-1.5, nD4-0.5, nD4-1,  nC4-1];\n    m16 = measure [nF4-3,   R-1];\n\n\n    add leg(m0[0]);\n    add leg(m1[0]);\n    add leg(m8[0]);\n    add leg(m16[0]);\n\n\n    read(m0); read(m1); read(m2); read(m3); read(m4);\n    read(m5); read(m6); read(m7); read(m8); read(m9);\n    read(m10); read(m11); read(m12); read(m13); read(m14);\n    read(m15); read(m16);\n}\n\ntrack chords {\n    set wave(triangle);\n    set volume(50);\n\n\n    c0 = measure [[code(F)-1]];\n\n    c1  = measure [[code(F)-4]];\n    c2  = measure [[code(C7)-4]];\n    c3  = measure [[code(F)-2], [code(Am)-2]];\n    c4  = measure [[code(Bb)-2], [code(C7)-2]];\n    c5  = measure [[code(F)-4]];\n    c6  = measure [[code(C7)-4]];\n    c7  = measure [[code(Dm)-2], [code(Gm)-2]];\n    c8  = measure [[code(F)-3], [code(Bb)-1]];\n    c9  = measure [[code(F)-2], [code(Am)-2]];\n    c10 = measure [[code(C7)-2], [code(Bb)-2]];\n    c11 = measure [[code(F)-2], [code(Am)-2]];\n    c12 = measure [[code(Bb)-2], [code(C7)-2]];\n    c13 = measure [[code(F)-4]];\n    c14 = measure [[code(C7)-4]];\n    c15 = measure [[code(Dm)-2], [code(Gm)-2]];\n    c16 = measure [[code(F)-3], R-1];\n\n    read(c0); read(c1); read(c2); read(c3); read(c4);\n    read(c5); read(c6); read(c7); read(c8); read(c9);\n    read(c10); read(c11); read(c12); read(c13); read(c14);\n    read(c15); read(c16);\n}\ntrack bass {\n    set wave(chiptune);\n    set volume(70);\n\n\n    b0 = measure [nF2-1];\n\n\n    b1  = measure [nF2-2, nF3-1, nF2-1];\n    b2  = measure [nC3-2, nC3-1, nC2-1];\n    b3  = measure [nF2-2, nA2-2];\n    b4  = measure [nBb2-2, nC3-2];\n    b5  = measure [nF2-2, nF3-1, nF2-1];\n    b6  = measure [nC3-2, nC3-1, nC2-1];\n    b7  = measure [nD3-2, nG2-2];\n    b8  = measure [nF2-3, nBb2-1];\n    b9  = measure [nF2-2, nA2-2];\n    b10 = measure [nC3-2, nBb2-2];\n    b11 = measure [nF2-2, nA2-2];\n    b12 = measure [nBb2-2, nC2-2];\n    b13 = measure [nF2-4];\n    b14 = measure [nC3-4];\n    b15 = measure [nD3-2, nG2-2];\n    b16 = measure [nF2-3, R-1];\n\n\n    read(b0); read(b1); read(b2); read(b3); read(b4);\n    read(b5); read(b6); read(b7); read(b8); read(b9);\n    read(b10); read(b11); read(b12); read(b13); read(b14);\n    read(b15); read(b16);\n}`,
+        newfeatures: `// v0.5.1 新機能デモ\n// 1) nなし音名記法  2) pulse50波形  3) .arpeggio  4) カスタムコード  5) スケール度数\nset tempo(110);\nset beat(4/4);\n\n// カスタムコード定義 (Name = chord [...])\nMyCmaj9 = chord [C4, E4, G4, B4, D5];\n\n// pulse50 波形 + nなし音名 + 動的記号\ntrack pulse_lead {\n    set wave(pulse50);\n    set volume(80);\n    melody = measure [C5-1^mf, E5-1^f, G5-2^ff, R-2];\n    cresc = measure.cre [C5-1, D5-1, E5-1, G5-1];\n    read(melody);\n    read(cresc);\n}\n\n// スケール度数記法 (set scale + 1_4-1 形式)\ntrack scale_lead {\n    set wave(triangle);\n    set volume(65);\n    set scale(major);\n    scale_run = measure [1_5-1, 2_5-1, 3_5-0.5, 4_5-0.5, 5_5-2];\n    read(scale_run);\n    read(scale_run);\n}\n\n// アルペジオ伴奏 (measure.arpeggio + カスタムコード)\ntrack arp_backing {\n    set wave(sine);\n    set volume(50);\n    arp = measure.arpeggio [[code(MyCmaj9)-2], [code(Am)-2]];\n    read(arp);\n    read(arp);\n}`,
+
+        daisy: `set tempo(144);
+set beat(3 / 4);
+
+track melody {
+    set wave(chiptune);
+    set volume(92);
+
+    m1  = measure [nD5-1, nDb5-1, nD5-1];
+    m2  = measure [nB4-1, nA4-1, nG4-1];
+    m3  = measure [nA4-2, nGb4-1];
+    m4  = measure [nD4-3];
+
+    m5  = measure [nA4-3];
+    m6  = measure [nD4-3];
+    m7  = measure [nD5-3];
+    m8  = measure [nB4-2, R-1];
+
+    m9  = measure [nD5-1, nDb5-1, nD5-1];
+    m10 = measure [nB4-1, nA4-1, nG4-1];
+    m11 = measure [nA4-2, nGb4-1];
+    m12 = measure [nD4-3];
+
+    m13 = measure [nG4-1, nD5-1, nG4-1];
+    m14 = measure [nGb4-1, nD4-1, nA4-1];
+    m15 = measure [nG4-3];
+    m16 = measure [nG4-2, R-1];
+
+    m17 = measure [nB4-1, nC5-1, nB4-1];
+    m18 = measure [nA4-1, nG4-1, nGb4-1];
+    m19 = measure [nB4-2, nG4-1];
+    m20 = measure [nE4-3];
+
+    m21 = measure [nD5-1, nC5-1, nB4-1];
+    m22 = measure [nA4-2, nBb4-1];
+    m23 = measure [nB4-3];
+    m24 = measure [nB4-2, R-1];
+
+    m25 = measure [nB4-1, nC5-1, nB4-1];
+    m26 = measure [nA4-1, nG4-1, nGb4-1];
+    m27 = measure [nB4-2, nG4-1];
+    m28 = measure [nE4-2, nB4-1];
+
+    m29 = measure [nA4-1, nE5-1, nDb5-1];
+    m30 = measure [nB4-2, nA4-1];
+    m31 = measure [nD5-3];
+    m32 = measure [nD5-2, R-1];
+
+    m33 = measure [nD5-3];
+    m34 = measure [nB4-3];
+    m35 = measure [nG4-3];
+    m36 = measure [nD4-3];
+
+    m37 = measure [nE4-1, nGb4-1, nG4-1];
+    m38 = measure [nE4-2, nG4-1];
+    m39 = measure [nD4-3];
+    m40 = measure [nD4-2, R-1];
+
+    m41 = measure [nA4-3];
+    m42 = measure [nD5-3];
+    m43 = measure [nB4-3];
+    m44 = measure [nG4-3];
+
+    m45 = measure [nE4-1, nGb4-1, nG4-1];
+    m46 = measure [nA4-2, nB4-1];
+    m47 = measure [nA4-3];
+    m48 = measure [nA4-1, R-1, nB4-1];
+
+    m49 = measure [nC5-1, nB4-1, nA4-1];
+    m50 = measure [nD5-2, nB4-1];
+    m51 = measure [nA4-1, nG4-2];
+    m52 = measure [nG4-2, nA4-1];
+
+    m53 = measure [nB4-2, nG4-1];
+    m54 = measure [nE4-2, nG4-1];
+    m55 = measure [nE4-1, nD4-2];
+    m56 = measure [nD4-1, R-1, nD4-1];
+
+    m57 = measure [nG4-2, nB4-1];
+    m58 = measure [nA4-2, R-1];
+    m59 = measure [nG4-2, nB4-1];
+    m60 = measure [nA4-1, nB4-1, nC5-1];
+
+    m61 = measure [nD5-1, nB4-1, nG4-1];
+    m62 = measure [nA4-2, nD4-1];
+    m63 = measure [nG4-3];
+    m64 = measure [nG4-2, R-1];
+
+    read(m1); read(m2); read(m3); read(m4); read(m5); read(m6); read(m7); read(m8);
+    read(m9); read(m10); read(m11); read(m12); read(m13); read(m14); read(m15); read(m16);
+    read(m17); read(m18); read(m19); read(m20); read(m21); read(m22); read(m23); read(m24);
+    read(m25); read(m26); read(m27); read(m28); read(m29); read(m30); read(m31); read(m32);
+    read(m33); read(m34); read(m35); read(m36); read(m37); read(m38); read(m39); read(m40);
+    read(m41); read(m42); read(m43); read(m44); read(m45); read(m46); read(m47); read(m48);
+    read(m49); read(m50); read(m51); read(m52); read(m53); read(m54); read(m55); read(m56);
+    read(m57); read(m58); read(m59); read(m60); read(m61); read(m62); read(m63); read(m64);
+
+    read(m1); read(m2); read(m3); read(m4); read(m5); read(m6); read(m7); read(m8);
+    read(m9); read(m10); read(m11); read(m12); read(m13); read(m14); read(m15); read(m16);
+    read(m17); read(m18); read(m19); read(m20); read(m21); read(m22); read(m23); read(m24);
+    read(m25); read(m26); read(m27); read(m28); read(m29); read(m30); read(m31); read(m32);
+    read(m33); read(m34); read(m35); read(m36); read(m37); read(m38); read(m39); read(m40);
+    read(m41); read(m42); read(m43); read(m44); read(m45); read(m46); read(m47); read(m48);
+    read(m49); read(m50); read(m51); read(m52); read(m53); read(m54); read(m55); read(m56);
+    read(m57); read(m58); read(m59); read(m60); read(m61); read(m62); read(m63); read(m64);
+}
+
+
+track harmony_3rd {
+    set wave(triangle);
+    set volume(36);
+
+    h1  = measure [nB4-3];
+    h2  = measure [nG4-1, nD4-1, nB3-1];
+    h3  = measure [nD4-3];
+    h4  = measure [nB3-3];
+
+    h5  = measure [nGb4-3];
+    h6  = measure [nB3-3];
+    h7  = measure [nA4-3];
+    h8  = measure [nG4-2, R-1];
+
+    h9  = measure [nB4-3];
+    h10 = measure [nG4-1, nD4-1, nB3-1];
+    h11 = measure [nD4-3];
+    h12 = measure [nB3-3];
+
+    h13 = measure [nE4-1, nG4-1, nE4-1];
+    h14 = measure [nD4-1, nA3-1, nGb4-1];
+    h15 = measure [nB3-3];
+    h16 = measure [nB3-2, R-1];
+
+    h17 = measure [nG4-1, nA4-1, nG4-1];
+    h18 = measure [nGb4-1, nE4-1, nD4-1];
+    h19 = measure [nG4-2, nE4-1];
+    h20 = measure [nG3-3];
+
+    h21 = measure [nB3-1, nA3-1, nG3-1];
+    h22 = measure [nGb4-2, nG4-1];
+    h23 = measure [nG4-3];
+    h24 = measure [nG4-2, R-1];
+
+    h25 = measure [nG4-1, nA4-1, nG4-1];
+    h26 = measure [nGb4-1, nE4-1, nD4-1];
+    h27 = measure [nG4-2, nE4-1];
+    h28 = measure [nG3-2, nG4-1];
+
+    h29 = measure [nE4-1, nDb5-1, nA4-1];
+    h30 = measure [nG4-2, nGb4-1];
+    h31 = measure [nB4-3];
+    h32 = measure [nA4-2, R-1];
+
+    h33 = measure [nB4-3];
+    h34 = measure [nG4-3];
+    h35 = measure [nE4-3];
+    h36 = measure [nB3-3];
+
+    h37 = measure [nC4-1, nD4-1, nE4-1];
+    h38 = measure [nC4-2, nE4-1];
+    h39 = measure [nA3-3];
+    h40 = measure [nB3-2, R-1];
+
+    h41 = measure [nGb4-3];
+    h42 = measure [nB4-3];
+    h43 = measure [nG4-3];
+    h44 = measure [nE4-3];
+
+    h45 = measure [nC4-1, nD4-1, nE4-1];
+    h46 = measure [nGb4-2, nG4-1];
+    h47 = measure [nGb4-3];
+    h48 = measure [nGb4-1, R-1, nG4-1];
+
+    h49 = measure [nE4-1, nG4-1, nF4-1];
+    h50 = measure [nB4-2, nG4-1];
+    h51 = measure [nGb4-1, nE4-2];
+    h52 = measure [nE4-2, nGb4-1];
+
+    h53 = measure [nG4-2, nE4-1];
+    h54 = measure [nC4-2, nE4-1];
+    h55 = measure [nC4-1, nA3-2];
+    h56 = measure [nB3-1, R-1, nB3-1];
+
+    h57 = measure [nE4-2, nG4-1];
+    h58 = measure [nGb4-2, R-1];
+    h59 = measure [nE4-2, nG4-1];
+    h60 = measure [nF4-1, nG4-1, nE4-1];
+
+    h61 = measure [nB4-1, nG4-1, nE4-1];
+    h62 = measure [nGb4-2, nA3-1];
+    h63 = measure [nB3-3];
+    h64 = measure [nB3-2, R-1];
+
+    read(h1); read(h2); read(h3); read(h4); read(h5); read(h6); read(h7); read(h8);
+    read(h9); read(h10); read(h11); read(h12); read(h13); read(h14); read(h15); read(h16);
+    read(h17); read(h18); read(h19); read(h20); read(h21); read(h22); read(h23); read(h24);
+    read(h25); read(h26); read(h27); read(h28); read(h29); read(h30); read(h31); read(h32);
+    read(h33); read(h34); read(h35); read(h36); read(h37); read(h38); read(h39); read(h40);
+    read(h41); read(h42); read(h43); read(h44); read(h45); read(h46); read(h47); read(h48);
+    read(h49); read(h50); read(h51); read(h52); read(h53); read(h54); read(h55); read(h56);
+    read(h57); read(h58); read(h59); read(h60); read(h61); read(h62); read(h63); read(h64);
+
+    read(h1); read(h2); read(h3); read(h4); read(h5); read(h6); read(h7); read(h8);
+    read(h9); read(h10); read(h11); read(h12); read(h13); read(h14); read(h15); read(h16);
+    read(h17); read(h18); read(h19); read(h20); read(h21); read(h22); read(h23); read(h24);
+    read(h25); read(h26); read(h27); read(h28); read(h29); read(h30); read(h31); read(h32);
+    read(h33); read(h34); read(h35); read(h36); read(h37); read(h38); read(h39); read(h40);
+    read(h41); read(h42); read(h43); read(h44); read(h45); read(h46); read(h47); read(h48);
+    read(h49); read(h50); read(h51); read(h52); read(h53); read(h54); read(h55); read(h56);
+    read(h57); read(h58); read(h59); read(h60); read(h61); read(h62); read(h63); read(h64);
+}
+
+
+
+track waltz_chords {
+    set wave(triangle);
+    set volume(44);
+
+    cG  = measure [R-1, [code(G)-1],  [code(G)-1]];
+    cD7 = measure [R-1, [code(D7)-1], [code(D7)-1]];
+    cC  = measure [R-1, [code(C)-1],  [code(C)-1]];
+    cEm = measure [R-1, [code(Em)-1], [code(Em)-1]];
+    cA7 = measure [R-1, [code(A7)-1], [code(A7)-1]];
+    cAm = measure [R-1, [code(Am)-1], [code(Am)-1]];
+
+    read(cG); read(cG); read(cD7); read(cG); read(cD7); read(cG); read(cD7); read(cG);
+    read(cG); read(cG); read(cD7); read(cG); read(cC); read(cD7); read(cG); read(cG);
+    read(cEm); read(cD7); read(cEm); read(cEm); read(cG); read(cD7); read(cG); read(cG);
+    read(cEm); read(cD7); read(cEm); read(cEm); read(cA7); read(cD7); read(cG); read(cD7);
+    read(cG); read(cEm); read(cC); read(cG); read(cC); read(cAm); read(cD7); read(cG);
+    read(cD7); read(cG); read(cEm); read(cC); read(cC); read(cD7); read(cD7); read(cD7);
+    read(cC); read(cG); read(cD7); read(cG); read(cEm); read(cC); read(cD7); read(cG);
+    read(cG); read(cD7); read(cG); read(cC); read(cG); read(cD7); read(cG); read(cG);
+
+    read(cG); read(cG); read(cD7); read(cG); read(cD7); read(cG); read(cD7); read(cG);
+    read(cG); read(cG); read(cD7); read(cG); read(cC); read(cD7); read(cG); read(cG);
+    read(cEm); read(cD7); read(cEm); read(cEm); read(cG); read(cD7); read(cG); read(cG);
+    read(cEm); read(cD7); read(cEm); read(cEm); read(cA7); read(cD7); read(cG); read(cD7);
+    read(cG); read(cEm); read(cC); read(cG); read(cC); read(cAm); read(cD7); read(cG);
+    read(cD7); read(cG); read(cEm); read(cC); read(cC); read(cD7); read(cD7); read(cD7);
+    read(cC); read(cG); read(cD7); read(cG); read(cEm); read(cC); read(cD7); read(cG);
+    read(cG); read(cD7); read(cG); read(cC); read(cG); read(cD7); read(cG); read(cG);
+}
+
+track bass {
+    set wave(chiptune);
+    set volume(72);
+
+    bG  = measure [nG2-1, R-1, nD3-1];
+    bD7 = measure [nD2-1, R-1, nA2-1];
+    bC  = measure [nC2-1, R-1, nG2-1];
+    bEm = measure [nE2-1, R-1, nB2-1];
+    bA7 = measure [nA2-1, R-1, nE3-1];
+    bAm = measure [nA2-1, R-1, nE3-1];
+
+    read(bG); read(bG); read(bD7); read(bG); read(bD7); read(bG); read(bD7); read(bG);
+    read(bG); read(bG); read(bD7); read(bG); read(bC); read(bD7); read(bG); read(bG);
+    read(bEm); read(bD7); read(bEm); read(bEm); read(bG); read(bD7); read(bG); read(bG);
+    read(bEm); read(bD7); read(bEm); read(bEm); read(bA7); read(bD7); read(bG); read(bD7);
+    read(bG); read(bEm); read(bC); read(bG); read(bC); read(bAm); read(bD7); read(bG);
+    read(bD7); read(bG); read(bEm); read(bC); read(bC); read(bD7); read(bD7); read(bD7);
+    read(bC); read(bG); read(bD7); read(bG); read(bEm); read(bC); read(bD7); read(bG);
+    read(bG); read(bD7); read(bG); read(bC); read(bG); read(bD7); read(bG); read(bG);
+
+    read(bG); read(bG); read(bD7); read(bG); read(bD7); read(bG); read(bD7); read(bG);
+    read(bG); read(bG); read(bD7); read(bG); read(bC); read(bD7); read(bG); read(bG);
+    read(bEm); read(bD7); read(bEm); read(bEm); read(bG); read(bD7); read(bG); read(bG);
+    read(bEm); read(bD7); read(bEm); read(bEm); read(bA7); read(bD7); read(bG); read(bD7);
+    read(bG); read(bEm); read(bC); read(bG); read(bC); read(bAm); read(bD7); read(bG);
+    read(bD7); read(bG); read(bEm); read(bC); read(bC); read(bD7); read(bD7); read(bD7);
+    read(bC); read(bG); read(bD7); read(bG); read(bEm); read(bC); read(bD7); read(bG);
+    read(bG); read(bD7); read(bG); read(bC); read(bG); read(bD7); read(bG); read(bG);
+}
+
+
+
+track verse2_descant {
+    set wave(triangle);
+    set volume(28);
+
+    z0 = measure [R-3];
+
+    // 1番のあいだ休む
+    read(z0); read(z0); read(z0); read(z0); read(z0); read(z0); read(z0); read(z0);
+    read(z0); read(z0); read(z0); read(z0); read(z0); read(z0); read(z0); read(z0);
+    read(z0); read(z0); read(z0); read(z0); read(z0); read(z0); read(z0); read(z0);
+    read(z0); read(z0); read(z0); read(z0); read(z0); read(z0); read(z0); read(z0);
+    read(z0); read(z0); read(z0); read(z0); read(z0); read(z0); read(z0); read(z0);
+    read(z0); read(z0); read(z0); read(z0); read(z0); read(z0); read(z0); read(z0);
+    read(z0); read(z0); read(z0); read(z0); read(z0); read(z0); read(z0); read(z0);
+    read(z0); read(z0); read(z0); read(z0); read(z0); read(z0); read(z0); read(z0);
+
+    // 2番 Verse: 安全な上ハモリ
+    z1  = measure [nB5-3];
+    z2  = measure [nD6-2, nB5-1];
+    z3  = measure [nA5-2, nGb5-1];
+    z4  = measure [nB5-3];
+
+    z5  = measure [nA5-3];
+    z6  = measure [nB5-3];
+    z7  = measure [nA5-3];
+    z8  = measure [nB5-2, R-1];
+
+    z9  = measure [nB5-3];
+    z10 = measure [nD6-2, nB5-1];
+    z11 = measure [nA5-2, nGb5-1];
+    z12 = measure [nB5-3];
+
+    z13 = measure [nG5-2, nE5-1];
+    z14 = measure [nA5-2, nGb5-1];
+    z15 = measure [nB5-3];
+    z16 = measure [nB5-2, R-1];
+
+    z17 = measure [nG5-2, nB5-1];
+    z18 = measure [nA5-2, nGb5-1];
+    z19 = measure [nG5-2, nB5-1];
+    z20 = measure [nG5-3];
+
+    z21 = measure [nB5-2, nD6-1];
+    z22 = measure [nA5-2, nGb5-1];
+    z23 = measure [nB5-3];
+    z24 = measure [nB5-2, R-1];
+
+    z25 = measure [nG5-2, nB5-1];
+    z26 = measure [nA5-2, nGb5-1];
+    z27 = measure [nG5-2, nB5-1];
+    z28 = measure [nG5-2, nB5-1];
+
+    z29 = measure [nDb6-2, nE6-1];
+    z30 = measure [nA5-2, nGb5-1];
+    z31 = measure [nB5-3];
+    z32 = measure [nA5-2, R-1];
+
+    // 2番 Chorus: 明るいけど濁りにくい上声
+    z33 = measure [nD6-3];
+    z34 = measure [nB5-3];
+    z35 = measure [nG5-3];
+    z36 = measure [nD5-3];
+
+    z37 = measure [nE5-1, nG5-1, nC6-1];
+    z38 = measure [nE5-2, nC6-1];
+    z39 = measure [nA5-3];
+    z40 = measure [nB5-2, R-1];
+
+    z41 = measure [nA5-3];
+    z42 = measure [nD6-3];
+    z43 = measure [nB5-3];
+    z44 = measure [nG5-3];
+
+    z45 = measure [nE5-1, nG5-1, nC6-1];
+    z46 = measure [nA5-2, nGb5-1];
+    z47 = measure [nA5-3];
+    z48 = measure [nA5-1, R-1, nA5-1];
+
+    z49 = measure [nG5-1, nE5-1, nC5-1];
+    z50 = measure [nD6-2, nB5-1];
+    z51 = measure [nA5-1, nGb5-2];
+    z52 = measure [nB5-2, nD6-1];
+
+    z53 = measure [nB5-2, nG5-1];
+    z54 = measure [nG5-2, nE5-1];
+    z55 = measure [nA5-1, nGb5-2];
+    z56 = measure [nB5-1, R-1, nB5-1];
+
+    z57 = measure [nB5-2, nD6-1];
+    z58 = measure [nA5-2, R-1];
+    z59 = measure [nB5-2, nD6-1];
+    z60 = measure [nC6-1, nE6-1, nG6-1];
+
+    z61 = measure [nD6-1, nB5-1, nG5-1];
+    z62 = measure [nA5-2, nGb5-1];
+    z63 = measure [nB5-3];
+    z64 = measure [nB5-2, R-1];
+
+    read(z1); read(z2); read(z3); read(z4); read(z5); read(z6); read(z7); read(z8);
+    read(z9); read(z10); read(z11); read(z12); read(z13); read(z14); read(z15); read(z16);
+    read(z17); read(z18); read(z19); read(z20); read(z21); read(z22); read(z23); read(z24);
+    read(z25); read(z26); read(z27); read(z28); read(z29); read(z30); read(z31); read(z32);
+    read(z33); read(z34); read(z35); read(z36); read(z37); read(z38); read(z39); read(z40);
+    read(z41); read(z42); read(z43); read(z44); read(z45); read(z46); read(z47); read(z48);
+    read(z49); read(z50); read(z51); read(z52); read(z53); read(z54); read(z55); read(z56);
+    read(z57); read(z58); read(z59); read(z60); read(z61); read(z62); read(z63); read(z64);
+}
+`
     };
 
     // Global variables
