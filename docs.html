@@ -1,0 +1,496 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="ja">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="eightman999が制作で実際に使っている技術・サービスの公式ドキュメント集（DevDocs）。GitHub・Cloudflare・Swift・Kotlin・Claude/MCP・HOI4 modding・伺かなど。">
+  <meta name="keywords" content="eightman999, ドキュメント, DevDocs, 技術スタック, Swift, Kotlin, Cloudflare, GitHub, Claude, MCP, HOI4, 伺か">
+  <title>†DevDocs†</title>
+  <link rel="stylesheet" href="styles.css">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6773256815988241"
+     crossorigin="anonymous"></script>
+  <style>
+    /* ===== Win95風ウィンドウの外枠（サイトのレトロ感に合わせる） ===== */
+    .docwin {
+      border: 2px solid #000;
+      border-radius: 4px 4px 6px 6px;
+      background: #c0c0c0;
+      box-shadow: inset 1px 1px #dfdfdf, inset -1px -1px #808080, 4px 4px 12px rgba(0,0,0,0.35);
+      overflow: hidden;
+    }
+    .docwin-titlebar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(to right, #000080, #1084d0);
+      color: #fff;
+      padding: 3px 4px 3px 6px;
+      font: bold 12px Tahoma, 'MS Sans Serif', sans-serif;
+    }
+    .docwin-title { display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .docwin-title .ico { font-size: 13px; }
+    .docwin-buttons { display: flex; gap: 2px; flex: 0 0 auto; }
+    .docwin-buttons b {
+      width: 18px; height: 16px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: #c0c0c0; color: #000;
+      border: 1px solid #000;
+      box-shadow: inset 1px 1px #fff, inset -1px -1px #808080;
+      font: 10px Tahoma, sans-serif; line-height: 1;
+    }
+    .docwin-menubar {
+      background: #c0c0c0;
+      border-bottom: 1px solid #808080;
+      box-shadow: inset 0 1px #fff;
+      padding: 2px 6px;
+      font: 12px Tahoma, 'MS Sans Serif', sans-serif;
+      color: #000;
+    }
+    .docwin-menubar span { margin-right: 12px; }
+    .docwin-menubar u { text-decoration: underline; }
+    .docwin-statusbar {
+      background: #c0c0c0;
+      border-top: 1px solid #fff;
+      box-shadow: inset 0 1px #808080;
+      padding: 3px 8px;
+      font: 11px Tahoma, sans-serif;
+      color: #000;
+      display: flex; justify-content: space-between; gap: 8px;
+    }
+    .docwin-statusbar .cell {
+      border: 1px solid #808080;
+      box-shadow: inset 1px 1px #fff;
+      padding: 1px 8px;
+    }
+
+    /* ===== 中身はモダンに（ダークなカードポータル） ===== */
+    .docwin-body {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #1c2230;
+      --border: #2a3340;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      background:
+        radial-gradient(900px 360px at 12% -10%, rgba(56,139,253,0.12), transparent 60%),
+        radial-gradient(700px 320px at 105% 0%, rgba(246,130,31,0.10), transparent 55%),
+        var(--bg);
+      color: var(--text);
+      padding: 22px 20px 26px;
+      font-family: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    .dp-hero { margin: 4px 2px 20px; }
+    .dp-eyebrow {
+      font: 600 11px/1 ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+      letter-spacing: .22em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 10px;
+    }
+    .dp-title {
+      margin: 0; color: #fff;
+      font: 800 clamp(28px, 5vw, 44px)/1.05 ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+      letter-spacing: -0.01em;
+    }
+    .dp-title span { color: #58a6ff; }
+    .dp-sub { margin: 12px 0 0; max-width: 60ch; color: var(--muted); font-size: 14.5px; line-height: 1.7; }
+
+    /* コントロール（検索＋カテゴリ） */
+    .dp-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 4px 2px 22px; }
+    #dp-search {
+      flex: 1 1 240px; min-width: 0;
+      background: var(--surface); color: var(--text);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 10px 14px; font-size: 14px; outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    #dp-search::placeholder { color: #6e7781; }
+    #dp-search:focus { border-color: #388bfd; box-shadow: 0 0 0 3px rgba(56,139,253,0.25); }
+    .dp-filters { display: flex; flex-wrap: wrap; gap: 6px; }
+    .dp-pill {
+      background: var(--surface); color: var(--muted);
+      border: 1px solid var(--border); border-radius: 999px;
+      padding: 7px 13px; font-size: 12.5px; cursor: pointer;
+      transition: all .15s; white-space: nowrap;
+    }
+    .dp-pill:hover { color: var(--text); border-color: #3d4a5c; }
+    .dp-pill.active { background: #1f6feb; border-color: #1f6feb; color: #fff; }
+
+    .dp-group { margin-bottom: 30px; }
+    .dp-group-head { display: flex; align-items: baseline; gap: 10px; margin: 0 2px 14px; }
+    .dp-group-head h3 {
+      margin: 0; color: #fff; font-size: 16px; font-weight: 700; letter-spacing: .01em;
+    }
+    .dp-group-head .cnt { color: var(--muted); font-size: 12px; }
+    .dp-group-head::after { content: ""; flex: 1; height: 1px; background: linear-gradient(to right, var(--border), transparent); align-self: center; }
+
+    .dp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+      gap: 14px;
+    }
+
+    .dp-card {
+      position: relative;
+      display: flex; flex-direction: column;
+      background: linear-gradient(180deg, var(--surface2), var(--surface));
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 16px 14px;
+      overflow: hidden;
+      transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+    }
+    .dp-card::before {
+      content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+      background: var(--c, #58a6ff);
+    }
+    .dp-card::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+      background: radial-gradient(420px 140px at 100% 0%, var(--c, #58a6ff), transparent 70%);
+      transition: opacity .18s ease;
+    }
+    .dp-card:hover { transform: translateY(-4px); border-color: var(--c, #58a6ff); box-shadow: 0 10px 26px rgba(0,0,0,0.45); }
+    .dp-card:hover::after { opacity: .10; }
+
+    .dp-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+    .dp-name { margin: 0; font-size: 15.5px; font-weight: 700; color: #fff; }
+    .dp-badge {
+      flex: 0 0 auto; font: 600 10.5px/1 ui-monospace, Menlo, monospace;
+      letter-spacing: .04em; text-transform: uppercase;
+      color: var(--c, #58a6ff);
+      border: 1px solid color-mix(in srgb, var(--c, #58a6ff) 45%, transparent);
+      background: color-mix(in srgb, var(--c, #58a6ff) 14%, transparent);
+      padding: 4px 8px; border-radius: 999px;
+    }
+    .dp-tagline { margin: 0 0 8px; font-size: 13px; font-weight: 600; color: #c9d4e0; }
+    .dp-desc { margin: 0 0 12px; font-size: 12.5px; line-height: 1.65; color: var(--muted); flex: 1; }
+    .dp-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
+    .dp-tag { font-size: 11px; color: #adbac7; background: #0d1117; border: 1px solid var(--border); border-radius: 6px; padding: 3px 7px; }
+    .dp-used { font-size: 11px; color: #6e7781; margin: 0 0 12px; }
+    .dp-used b { color: #8b949e; font-weight: 600; }
+    .dp-link {
+      align-self: flex-start;
+      display: inline-flex; align-items: center; gap: 6px;
+      text-decoration: none; color: #fff;
+      background: var(--c, #1f6feb);
+      padding: 8px 14px; border-radius: 9px;
+      font-size: 12.5px; font-weight: 700;
+      transition: filter .15s, transform .15s;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+    .dp-link:hover { filter: brightness(1.12); transform: translateX(2px); color: #fff; text-decoration: none; }
+    .dp-link:visited { color: #fff; }
+    .dp-arrow { transition: transform .15s; }
+    .dp-link:hover .dp-arrow { transform: translateX(2px); }
+
+    .dp-empty { text-align: center; color: var(--muted); padding: 30px 0; font-size: 14px; }
+
+    @media screen and (max-width: 480px) {
+      .docwin-body { padding: 16px 12px 20px; }
+      .dp-grid { grid-template-columns: 1fr; }
+      .docwin-menubar { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>†‡ DevDocs ‡†</h1>
+      <p>制作で実際に使っている技術・サービスの公式ドキュメント集</p>
+    </header>
+
+    <marquee class="info-bar" bgcolor="#ffffcc" scrolldelay="80">
+      【メモ】よく開く公式ドキュメントへのショートカット集です。リンク切れを見つけたらBBSで教えてください！
+    </marquee>
+
+    <div class="main-wrapper">
+      <aside class="sidebar">
+        <div class="sidebar-box menu">
+          <h3>* M E N U *</h3>
+          <ul>
+            <li><a href="index.html">トップ</a></li>
+            <li><a href="blog.html">ブログ</a></li>
+            <li><a href="quotes.html">好きな言葉</a></li>
+            <li><a href="omikuji.html">今日のおみくじ</a></li>
+            <li><a href="works.html">作品集</a></li>
+            <li><a href="docs.html">DevDocs</a></li>
+            <li><a href="library.html">書庫</a></li>
+            <li><a href="poem.html">ポエム</a></li>
+            <li><a href="bbs.html">BBS</a></li>
+            <li><a href="link.html">LINK</a></li>
+            <li><a href="news.html">更新履歴</a></li>
+            <li><a href="sitemap.html">サイトマップ</a></li>
+          </ul>
+        </div>
+      </aside>
+
+      <main>
+        <div class="docwin">
+          <div class="docwin-titlebar">
+            <span class="docwin-title"><span class="ico">📚</span>DevDocs.exe — eightman999 が使っている技術ドキュメント</span>
+            <span class="docwin-buttons"><b>_</b><b>□</b><b>×</b></span>
+          </div>
+          <div class="docwin-menubar">
+            <span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>B</u>ookmarks</span><span><u>H</u>elp</span>
+          </div>
+
+          <div class="docwin-body">
+            <div class="dp-hero">
+              <div class="dp-eyebrow">Personal Dev Reference</div>
+              <h2 class="dp-title">Dev<span>Docs</span></h2>
+              <p class="dp-sub">eightman999 が制作で実際に使っている技術・サービスの公式ドキュメント集。<br>気になるカードをクリックすると、それぞれの公式ドキュメントへ飛びます。</p>
+            </div>
+
+            <div class="dp-controls">
+              <input id="dp-search" type="text" placeholder="🔍 検索（例: swift / cloudflare / mod）" autocomplete="off">
+              <div class="dp-filters" id="dp-filters"></div>
+            </div>
+
+            <div id="dp-groups"></div>
+            <p class="dp-empty" id="dp-empty" hidden>該当するドキュメントが見つかりませんでした。</p>
+          </div>
+
+          <div class="docwin-statusbar">
+            <span class="cell" id="dp-count"></span>
+            <span class="cell">https://github.com/eightman999</span>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+          <a href="index.html">トップページに戻る</a>
+        </div>
+      </main>
+    </div>
+
+    <footer>
+      <p><small>Copyright &copy; 2001-2025 eightman999 All Rights Reserved.<br>サイト開設日: 2001年1月1日 / 最終更新日: <script>var d=new Date(document.lastModified);document.write(isNaN(d.getTime())?'2025年6月26日':d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日');</script></small></p>
+    </footer>
+  </div>
+
+  <script>
+  // ===== eightman999 が実際に使っている技術・サービス（GitHubリポジトリの実態ベース） =====
+  // 編集しやすいように1サービス=1オブジェクトの配列にしてあります。追加・削除はここだけ。
+  var GROUPS = [
+    { key: "infra",   label: "ホスティング & インフラ" },
+    { key: "ai",      label: "AI & エージェント" },
+    { key: "apple",   label: "Apple（macOS / iOS）" },
+    { key: "android", label: "Android / Kotlin" },
+    { key: "web",     label: "Web フロントエンド" },
+    { key: "game",    label: "ゲーム & クロスプラットフォーム" },
+    { key: "py",      label: "Python & ツール" },
+    { key: "mod",     label: "MOD制作 & ニッチ" }
+  ];
+
+  var SERVICES = [
+    // --- ホスティング & インフラ ---
+    { group:"infra", name:"GitHub Pages", category:"Hosting", color:"#2088FF",
+      tagline:"リポジトリから静的サイトを即公開",
+      desc:"このサイト（eightman999.github.io/web）やスキル集を無料でホスティング。",
+      tags:["静的ホスティング","独自ドメイン","HTTPS自動"], used:"web / hoi4-modding-skills",
+      url:"https://docs.github.com/pages" },
+    { group:"infra", name:"GitHub Actions", category:"CI/CD", color:"#58A6FF",
+      tagline:"Push / PR で自動ビルド & テスト",
+      desc:"各リポジトリのテスト・リリースを自動化するワークフロー基盤。",
+      tags:["YAMLワークフロー","自動テスト","リリース自動化"], used:"各リポジトリ",
+      url:"https://docs.github.com/actions" },
+    { group:"infra", name:"GitHub Releases", category:"Distribution", color:"#8957E5",
+      tagline:"バイナリとリリースノートを配布",
+      desc:"DiffLoupe や Ourin のビルド成果物をタグ付きで配布。",
+      tags:["タグ配布","バイナリ添付","自動ノート"], used:"DiffLoupe / Ourin",
+      url:"https://docs.github.com/repositories/releasing-projects-on-github" },
+    { group:"infra", name:"Cloudflare Workers", category:"Compute", color:"#F6821F",
+      tagline:"サーバーレスをエッジで実行",
+      desc:"おみくじAPI（jinjya-api）を世界中のエッジで低レイテンシ実行。",
+      tags:["サーバーレス","エッジ実行","Wrangler"], used:"jinjya-api",
+      url:"https://developers.cloudflare.com/workers/" },
+    { group:"infra", name:"Cloudflare D1", category:"Database", color:"#FBAD41",
+      tagline:"エッジで動くサーバーレスSQLite",
+      desc:"jinjya-api の神社・おみくじデータを保存するサーバーレスDB。",
+      tags:["SQLite互換","サーバーレス","マイグレーション"], used:"jinjya-api",
+      url:"https://developers.cloudflare.com/d1/" },
+    { group:"infra", name:"Firebase", category:"Backend", color:"#FFCA28",
+      tagline:"Firestore / 認証 / ホスティング",
+      desc:"Lunchon のリアルタイムデータと認証を支える BaaS。",
+      tags:["Firestore","Auth","Hosting"], used:"Lunchon",
+      url:"https://firebase.google.com/docs" },
+
+    // --- AI & エージェント ---
+    { group:"ai", name:"Claude Developer Platform", category:"AI", color:"#D97757",
+      tagline:"Claude API & Claude Code",
+      desc:"コード生成・AIエージェント連携・開発支援の中核として日常的に使用。",
+      tags:["Claude API","Claude Code","Tool Use"], used:"開発全般",
+      url:"https://platform.claude.com/docs" },
+    { group:"ai", name:"Model Context Protocol", category:"AI", color:"#8E75FF",
+      tagline:"AIとツールをつなぐ標準プロトコル",
+      desc:"自作のMCPサーバ群でローカルLLMやCLIをAIから操作可能に。",
+      tags:["MCPサーバ","ツール公開","stdio / SSE"], used:"mcp-lmstudio / mcp-codex-cli / mcp-hoi4",
+      url:"https://modelcontextprotocol.io/" },
+    { group:"ai", name:"LM Studio", category:"AI", color:"#5B5BD6",
+      tagline:"ローカルLLM実行環境",
+      desc:"手元のマシンでLLMを動かし、MCP経由でエージェントと連携。",
+      tags:["ローカルLLM","OpenAI互換API","GGUF"], used:"mcp-lmstudio / novllm",
+      url:"https://lmstudio.ai/docs" },
+
+    // --- Apple ---
+    { group:"apple", name:"Swift", category:"Language", color:"#F05138",
+      tagline:"Apple系ネイティブの主力言語",
+      desc:"macOSネイティブアプリを支える型安全なモダン言語。",
+      tags:["型安全","Concurrency","SwiftPM"], used:"Ourin / DiffLoupe / Kodukaityou_APP",
+      url:"https://www.swift.org/documentation/" },
+    { group:"apple", name:"SwiftUI", category:"UI", color:"#0A84FF",
+      tagline:"宣言的UIフレームワーク",
+      desc:"macOS / iOS のUIを宣言的に構築。プレビュー駆動で開発。",
+      tags:["宣言的UI","状態管理","Preview"], used:"DiffLoupe / NovelReader_apple",
+      url:"https://developer.apple.com/documentation/swiftui" },
+
+    // --- Android / Kotlin ---
+    { group:"android", name:"Kotlin", category:"Language", color:"#7F52FF",
+      tagline:"Android開発の主力言語",
+      desc:"Androidアプリ全般で使う簡潔で安全なJVM言語。",
+      tags:["JVM","Null安全","Coroutines"], used:"CivNomics / Novel_reader_app / WattTime",
+      url:"https://kotlinlang.org/docs/home.html" },
+    { group:"android", name:"Jetpack Compose", category:"UI", color:"#3DDC84",
+      tagline:"Androidの宣言的UIツールキット",
+      desc:"モダンなAndroid UIをComposeで構築。",
+      tags:["宣言的UI","Material 3","State"], used:"Androidアプリ各種",
+      url:"https://developer.android.com/develop/ui/compose" },
+
+    // --- Web フロントエンド ---
+    { group:"web", name:"TypeScript", category:"Language", color:"#3178C6",
+      tagline:"型付きJavaScript",
+      desc:"APIやWebフロントを型安全に書くための主力言語。",
+      tags:["静的型付け","型推論","tsconfig"], used:"jinjya-api / Lunchon",
+      url:"https://www.typescriptlang.org/docs/" },
+    { group:"web", name:"Web APIs（MDN）", category:"Web", color:"#5FA8F5",
+      tagline:"ブラウザAPIリファレンス",
+      desc:"Web Audio API など、Uzumeコンパイラの実装で参照。",
+      tags:["Web Audio","DOM","Fetch"], used:"Uzume / web",
+      url:"https://developer.mozilla.org/ja/docs/Web/API" },
+    { group:"web", name:"Quasar（Vue）", category:"Framework", color:"#42B883",
+      tagline:"Vueベースのアプリ基盤",
+      desc:"Lunchon のクロスプラットフォームフロントエンドを構築。",
+      tags:["Vue 3","Components","PWA"], used:"Lunchon",
+      url:"https://quasar.dev/" },
+
+    // --- ゲーム & クロスプラットフォーム ---
+    { group:"game", name:"Flutter", category:"Framework", color:"#02569B",
+      tagline:"Dart製クロスプラットフォームUI",
+      desc:"1つのコードベースでモバイルUIを構築。",
+      tags:["Dart","Hot Reload","Widget"], used:"Sedore",
+      url:"https://docs.flutter.dev/" },
+    { group:"game", name:"Godot Engine", category:"Game", color:"#478CBF",
+      tagline:"軽量オープンソースゲームエンジン",
+      desc:"GDScriptでゲームのプロトタイプを制作。",
+      tags:["GDScript","2D / 3D","Scene"], used:"incredible-investers / Kessler-Syndrome / chess-advance",
+      url:"https://docs.godotengine.org/" },
+
+    // --- Python & ツール ---
+    { group:"py", name:"Python", category:"Language", color:"#FFD43B",
+      tagline:"ツール・データ処理の主力",
+      desc:"GUIツールやデータ処理スクリプトを量産する万能言語。",
+      tags:["標準ライブラリ","データ処理","スクリプト"], used:"N-Editor / novllm / data-analyzer",
+      url:"https://docs.python.org/ja/3/" },
+    { group:"py", name:"Qt for Python（PySide6）", category:"GUI", color:"#41CD52",
+      tagline:"デスクトップGUIフレームワーク",
+      desc:"HOI4ツールやリーダーアプリのGUIを構築。",
+      tags:["Widgets","Signal / Slot","Qt Designer"], used:"N-Editor / NVPDA",
+      url:"https://doc.qt.io/qtforpython/" },
+
+    // --- MOD制作 & ニッチ ---
+    { group:"mod", name:"HOI4 Modding Wiki", category:"Modding", color:"#C0A062",
+      tagline:"Paradoxスクリプト公式リファレンス",
+      desc:"HOI4 MOD制作のイベント・OOB・各種定義の一次資料。",
+      tags:["Clausewitz","Events","OOB"], used:"japanese_fleet_mod / hoi4-modding-skills",
+      url:"https://hoi4.paradoxwikis.com/Modding" },
+    { group:"mod", name:"CWTools", category:"Tooling", color:"#8A63D2",
+      tagline:"Paradoxスクリプトの言語支援",
+      desc:"HOI4スクリプトの検証・補完を行うLSP / エディタ拡張。",
+      tags:["LSP","検証","補完"], used:"HOI4 MOD開発",
+      url:"https://github.com/cwtools/cwtools" },
+    { group:"mod", name:"UKADOC Project", category:"Spec", color:"#FF6699",
+      tagline:"伺かプロトコル公式仕様",
+      desc:"SHIORI / SakuraScript / SERIKO など Ourin 実装の一次資料。",
+      tags:["SHIORI","SakuraScript","SERIKO"], used:"Ourin",
+      url:"https://ssp.shillest.net/ukadoc/manual/index.html" }
+  ];
+
+  (function () {
+    var groupsEl = document.getElementById('dp-groups');
+    var filtersEl = document.getElementById('dp-filters');
+    var searchEl = document.getElementById('dp-search');
+    var emptyEl = document.getElementById('dp-empty');
+    var countEl = document.getElementById('dp-count');
+    var activeGroup = 'all';
+    var query = '';
+
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+
+    function cardHTML(s) {
+      var tags = s.tags.map(function (t) { return '<span class="dp-tag">' + esc(t) + '</span>'; }).join('');
+      return '<article class="dp-card" style="--c:' + s.color + '">' +
+        '<div class="dp-card-top">' +
+          '<h4 class="dp-name">' + esc(s.name) + '</h4>' +
+          '<span class="dp-badge">' + esc(s.category) + '</span>' +
+        '</div>' +
+        '<p class="dp-tagline">' + esc(s.tagline) + '</p>' +
+        '<p class="dp-desc">' + esc(s.desc) + '</p>' +
+        '<div class="dp-tags">' + tags + '</div>' +
+        '<p class="dp-used"><b>使用:</b> ' + esc(s.used) + '</p>' +
+        '<a class="dp-link" href="' + esc(s.url) + '" target="_blank" rel="noopener">' +
+          '公式ドキュメント <span class="dp-arrow">→</span></a>' +
+      '</article>';
+    }
+
+    function matches(s) {
+      if (activeGroup !== 'all' && s.group !== activeGroup) return false;
+      if (!query) return true;
+      var hay = (s.name + ' ' + s.category + ' ' + s.tagline + ' ' + s.desc + ' ' +
+                 s.tags.join(' ') + ' ' + s.used + ' ' + s.group).toLowerCase();
+      return hay.indexOf(query) !== -1;
+    }
+
+    function render() {
+      var html = '';
+      var total = 0;
+      GROUPS.forEach(function (g) {
+        var items = SERVICES.filter(function (s) { return s.group === g.key && matches(s); });
+        if (!items.length) return;
+        total += items.length;
+        html += '<section class="dp-group">' +
+          '<div class="dp-group-head"><h3>' + esc(g.label) + '</h3>' +
+          '<span class="cnt">' + items.length + '</span></div>' +
+          '<div class="dp-grid">' + items.map(cardHTML).join('') + '</div></section>';
+      });
+      groupsEl.innerHTML = html;
+      emptyEl.hidden = total !== 0;
+      countEl.textContent = total + ' / ' + SERVICES.length + ' 件のドキュメント';
+    }
+
+    // カテゴリのピル（すべて + 各グループ）
+    var pills = [{ key: 'all', label: 'すべて' }].concat(GROUPS);
+    filtersEl.innerHTML = pills.map(function (p, i) {
+      return '<button class="dp-pill' + (i === 0 ? ' active' : '') + '" data-g="' + p.key + '">' + esc(p.label) + '</button>';
+    }).join('');
+    filtersEl.addEventListener('click', function (e) {
+      var btn = e.target.closest('.dp-pill');
+      if (!btn) return;
+      activeGroup = btn.getAttribute('data-g');
+      Array.prototype.forEach.call(filtersEl.children, function (c) { c.classList.remove('active'); });
+      btn.classList.add('active');
+      render();
+    });
+    searchEl.addEventListener('input', function () {
+      query = searchEl.value.trim().toLowerCase();
+      render();
+    });
+
+    render();
+  })();
+  </script>
+
+</body>
+</html>
