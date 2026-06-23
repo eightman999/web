@@ -2,12 +2,25 @@
 <html lang="ja">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="eightman999の個人サイト。Hoi4やMinecraftのMOD作成、プログラミングに関する情報、日々の雑感などを公開しています。">
   <meta name="keywords" content="eightman999, Hoi4, Minecraft, MOD, プログラミング, テキストサイト, 個人サイト, 日記, ポエム">
+  <meta name="robots" content="noindex,nofollow">
   <title>†R18書庫†</title>
   <link rel="stylesheet" href="styles.css">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6773256815988241"
-     crossorigin="anonymous"></script>
+  <!-- 成人向けページのため広告(AdSense)は配信しない（ポリシー遵守） -->
+  <script>
+    // 年齢確認ゲート: 直接アクセス・検索流入でも必ず確認する
+    (function () {
+      try { if (sessionStorage.getItem('r18_ok') === '1') return; } catch (e) {}
+      var ok = window.confirm('このページには成人向け（R18）コンテンツが含まれます。\nあなたは18歳以上ですか？\n\n［ OK ＝ はい  ／  キャンセル ＝ いいえ ］');
+      if (ok) {
+        try { sessionStorage.setItem('r18_ok', '1'); } catch (e) {}
+      } else {
+        window.location.replace('library.html');
+      }
+    })();
+  </script>
 </head>
 <body>
 
@@ -31,6 +44,7 @@
           <h3>* M E N U *</h3>
           <ul>
             <li><a href="index.html">トップ</a></li>
+            <li><a href="blog.html">ブログ</a></li>
             <li><a href="quotes.html">好きな言葉</a></li>
             <li><a href="omikuji.html">今日のおみくじ</a></li>
             <li><a href="works.html">作品集</a></li>
@@ -53,25 +67,9 @@
         </div>
 
         <div class="box">
-          <h2>■ おすすめ作品（例）</h2>
-          
-          <div class="book-item">
-            <div class="book-title">[作品タイトル例]</div>
-            <div class="book-author">著者: [著者名]</div>
-            <div class="book-rating">
-              評価: <span class="star">★★★★☆</span> (4/5)
-            </div>
-            <p>
-              <strong>おすすめポイント:</strong><br>
-              [ここに作品の紹介文を書きます]
-            </p>
-            <div class="book-links">
-              <a href="#" target="_blank">サイトリンク</a>
-              <a href="#" target="_blank">書籍版</a>
-            </div>
-          </div>
-          
-          <!-- 他の作品も同様の形式で追加 -->
+          <h2>■ おすすめ作品</h2>
+          <p>ただいま準備中です。少々お待ちください。</p>
+          <!-- 作品を追加する場合は library.html の book-item と同じ形式で記述 -->
         </div>
 
         <div style="text-align: center; margin-top: 20px;">
@@ -82,7 +80,7 @@
     </div>
 
     <footer>
-      <p><small>Copyright &copy; 2001-2025 eightman999 All Rights Reserved.<br>サイト開設日: 2001年1月1日 / 最終更新日: 2025年6月26日</small></p>
+      <p><small>Copyright &copy; 2001-2025 eightman999 All Rights Reserved.<br>サイト開設日: 2001年1月1日 / 最終更新日: <script>var d=new Date(document.lastModified);document.write(isNaN(d.getTime())?'2025年6月26日':d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日');</script></small></p>
     </footer>
   </div>
 

@@ -52,11 +52,12 @@ function addGhostMessage() {
     if (message && message.length <= 50) {
         const ghostBoard = document.getElementById('ghost-board');
         const now = new Date();
-        const timestamp = now.getFullYear() + '.' + 
-                         (now.getMonth() + 1).toString().padStart(2, '0') + '.' + 
+        const h24 = now.getHours();
+        const timestamp = now.getFullYear() + '.' +
+                         (now.getMonth() + 1).toString().padStart(2, '0') + '.' +
                          now.getDate().toString().padStart(2, '0') + ' ' +
-                         (now.getHours() < 10 ? '午前' : '午後') +
-                         (now.getHours() % 12).toString().padStart(2, '0') + ':' +
+                         (h24 < 12 ? '午前' : '午後') +
+                         ((h24 % 12) || 12).toString().padStart(2, '0') + ':' +
                          now.getMinutes().toString().padStart(2, '0');
         
         const messageDiv = document.createElement('div');

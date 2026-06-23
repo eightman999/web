@@ -276,6 +276,58 @@ footer {
   transform: translateY(1px);
 }
 
+/* おみくじ結果の和紙風カード */
+.omikuji-paper {
+  text-align: center;
+  padding: 20px;
+  background: linear-gradient(to bottom, #FFFEF5, #FBF3D8);
+  border: 2px solid #D8C690;
+  border-radius: 8px;
+  margin: 15px auto;
+  max-width: 360px;
+  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2), inset 0 0 12px rgba(216, 198, 144, 0.4);
+}
+
+.omikuji-jinjya {
+  font-size: 13px;
+  color: #806000;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+/* フォーム部品（おみくじ抽選・奉納） */
+.omikuji-form {
+  margin-top: 10px;
+}
+
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  font-size: 13px;
+  margin-bottom: 4px;
+  color: #333333;
+}
+
+.form-group select,
+.form-group input[type="text"],
+.form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 8px;
+  font-size: 14px;
+  border: 1px solid #B0B0B0;
+  border-radius: 4px;
+  background: #FFFFFF;
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
 /* --- 作品集のスタイル --- */
 .work-item {
   border: 1px solid #B0B0B0;

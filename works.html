@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="eightman999の個人サイト。Hoi4やMinecraftのMOD作成、プログラミングに関する情報、日々の雑感などを公開しています。">
   <meta name="keywords" content="eightman999, Hoi4, Minecraft, MOD, プログラミング, テキストサイト, 個人サイト, 日記, ポエム">
   <title>†作品集†</title>
@@ -27,8 +28,9 @@
           <h3>* M E N U *</h3>
           <ul>
             <li><a href="index.html">トップ</a></li>
+            <li><a href="blog.html">ブログ</a></li>
             <li><a href="quotes.html">好きな言葉</a></li>
-            <li><a href="omikuji.html">今日のおみくuji</a></li>
+            <li><a href="omikuji.html">今日のおみくじ</a></li>
             <li><a href="works.html">作品集</a></li>
             <li><a href="library.html">書庫</a></li>
             <li><a href="poem.html">ポエム</a></li>
@@ -41,31 +43,71 @@
       <main>
         <div class="box">
           <h2>■ ツール・アプリケーション</h2>
-          
+
           <div class="work-item">
-            <div class="work-title">Watt time</div>
-            <div class="work-tech">使用技術: Kotlin</div>
-            <p>電子レンジの加熱時間とワット数を計算するアプリケーションです。食材の種類や量に応じた最適な加熱条件を提案します。</p>
+            <div class="work-title">DiffLoupe</div>
+            <div class="work-tech">使用技術: Swift / SwiftUI</div>
+            <p>WinMerge難民のための、macOSネイティブなフォルダ差分ツール。2つのフォルダを再帰比較して「一致／相違／左右のみ」を色分け表示し、テキストは行単位で差分を出します。比較エンジンは1万ファイルを約0.66秒で処理し、約6万ファイル規模の実フォルダ比較も完走。XCTest 19件すべてパス済みです。</p>
             <div class="work-links">
-              <a href="#" target="_blank">GitHub</a>
-              <a href="#" target="_blank">ダウンロード</a>
-              <a href="#" target="_blank">使い方ガイド</a>
+              <a href="https://github.com/eightman999/DiffLoupe" target="_blank">GitHub</a>
             </div>
           </div>
 
           <div class="work-item">
-            <div class="work-title">Uzume Player</div>
-            <div class="work-tech">使用技術: JavaScript, Web Audio API</div>
-            <p>Uzume言語で記述された楽譜をブラウザ上で再生できるプレイヤーです。</p>
+            <div class="work-title">Uzume</div>
+            <div class="work-tech">使用技術: JavaScript / Web Audio API</div>
+            <p>音符・和音・小節・ループ・楽想表現を記述できる独自の音楽プログラミング言語と、そのコンパイラ。AST・パーサー・発音までをゼロから自作し、Web Audio APIでブラウザ上で実際に鳴らせます。仕様書つき。</p>
             <div class="work-links">
               <a href="uzume_player.html">Uzume Playerを試す</a>
+              <a href="README_uzume.md" target="_blank">言語仕様</a>
+              <a href="https://github.com/eightman999/web" target="_blank">GitHub</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="box">
+          <h2>■ ライブラリ・開発支援</h2>
+
+          <div class="work-item">
+            <div class="work-title">hoi4-modding-skills</div>
+            <div class="work-tech">使用技術: Markdown / Python / AIエージェント連携</div>
+            <p>HOI4のMOD制作という専門作業をAIエージェントに委任するための、再利用可能なスキル集とリファレンス。20種以上のスキルを設計・パッケージ化し、中核のスキルは実作業で延べ160回以上呼び出されている、「作って終わり」ではない実運用中の資産です。</p>
+            <div class="work-links">
+              <a href="https://github.com/eightman999/hoi4-modding-skills" target="_blank">GitHub</a>
+            </div>
+          </div>
+
+          <div class="work-item">
+            <div class="work-title">jinjya-api</div>
+            <div class="work-tech">使用技術: TypeScript</div>
+            <p>このサイトの「<a href="omikuji.html">今日のおみくじ</a>」を動かしている自作のWeb API。神社ごとのおみくじの登録・抽選・奉納の機能を提供します。デモで終わらせず、当サイトで実際に本番運用しているのがポイントです。</p>
+            <div class="work-links">
+              <a href="omikuji.html">動かしてみる（おみくじ）</a>
+              <a href="https://github.com/eightman999/jinjya-api" target="_blank">GitHub</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="box">
+          <h2>■ 開発中のプロジェクト</h2>
+
+          <div class="work-item">
+            <div class="work-title">Ourin（桜鈴）<span style="font-size:11px; color:#cc0000; margin-left:6px;">【開発中】</span></div>
+            <div class="work-tech">使用技術: Swift / C++</div>
+            <p>「伺か」互換のデスクトップマスコット基盤を、macOSネイティブでフルスクラッチ実装中の挑戦的プロジェクト。SHIORI・SSTP・SakuraScript・SERIKOなど多数のプロトコルに取り組み、現在は379の単体テストが通る段階です。複数のAIによる相互コードレビュー体制を組んで品質を詰めています。</p>
+            <div class="work-links">
+              <a href="https://github.com/eightman999/Ourin" target="_blank">GitHub</a>
             </div>
           </div>
         </div>
 
 
-
-
+        <div class="box">
+          <p style="text-align:center; margin:5px 0;">
+            ここに載せきれない制作物は GitHub にもあります。<br>
+            → <a href="https://github.com/eightman999" target="_blank">github.com/eightman999</a>
+          </p>
+        </div>
 
         <div style="text-align: center; margin-top: 20px;">
           <a href="index.html">トップページに戻る</a>
@@ -74,7 +116,7 @@
     </div>
 
     <footer>
-      <p><small>Copyright &copy; 2001-2025 eightman999 All Rights Reserved.<br>サイト開設日: 2001年1月1日 / 最終更新日: 2025年6月26日</small></p>
+      <p><small>Copyright &copy; 2001-2025 eightman999 All Rights Reserved.<br>サイト開設日: 2001年1月1日 / 最終更新日: <script>var d=new Date(document.lastModified);document.write(isNaN(d.getTime())?'2025年6月26日':d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日');</script></small></p>
     </footer>
   </div>
 
