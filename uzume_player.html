@@ -53,6 +53,11 @@ read(melody);</textarea>
             <button id="play-btn" class="omikuji-button" disabled>▶️ 再生</button>
             <button id="stop-btn" class="omikuji-button" disabled style="margin-left: 10px;">⏹️ 停止</button>
           </div>
+
+          <div style="margin-top: 10px; text-align: center;">
+            <button id="download-midi-btn" class="omikuji-button" disabled style="margin-right: 10px;">💾 MIDI保存</button>
+            <button id="download-mp3-btn" class="omikuji-button" disabled>🎧 MP3保存</button>
+          </div>
           
           <div style="margin-top: 10px; text-align: center;">
             <label for="volume">🔊 音量:</label>
@@ -372,6 +377,7 @@ read(chord_progression);
     </footer>
   </div>
 
+  <script src="vendor/lame.min.js"></script>
   <script src="uzume.js"></script>
   <script>
     // Example codes
@@ -774,6 +780,7 @@ track verse2_descant {
     // Global variables
     let compiler;
     let compiledAudio = null;
+    let compiledSource = '';
     let isPlaying = false;
 
     // DOM elements
@@ -781,8 +788,10 @@ track verse2_descant {
     const compileBtn = document.getElementById('compile-btn');
     const playBtn = document.getElementById('play-btn');
     const stopBtn = document.getElementById('stop-btn');
+    const downloadMidiBtn = document.getElementById('download-midi-btn');
+    const downloadMp3Btn = document.getElementById('download-mp3-btn');
     const output = document.getElementById('output');
-    const statusMessage = document.getElementById('status-message'); // Changed from 'status'
+    const statusMessage = document.getElementById('status-message');
     const volumeSlider = document.getElementById('volume');
     const volumeValue = document.getElementById('volume-value');
     const trackInfo = document.getElementById('track-info');
@@ -790,22 +799,25 @@ track verse2_descant {
 
     // Initialize compiler
     compiler = new UzumeCompiler();
-    
+
     // Set initial volume from slider
-    const initialVolume = parseInt(volumeSlider.value);
+    const initialVolume = parseInt(volumeSlider.value, 10);
     if (compiler.audioEngine) {
         compiler.audioEngine.setMasterVolume(initialVolume / 100);
     }
 
     // Volume control
     volumeSlider.addEventListener('input', (e) => {
-        const volume = parseInt(e.target.value);
+        const volume = parseInt(e.target.value, 10);
         volumeValue.textContent = volume + '%';
-        
-        // Update master volume in audio engine
+
         if (compiler && compiler.audioEngine) {
             compiler.audioEngine.setMasterVolume(volume / 100);
         }
+    });
+
+    editor.addEventListener('input', () => {
+        invalidateCompiledOutput();
     });
 
     // Example buttons
@@ -814,6 +826,7 @@ track verse2_descant {
             const exampleKey = e.target.dataset.example;
             if (examples[exampleKey]) {
                 editor.value = examples[exampleKey];
+                invalidateCompiledOutput();
                 showStatus('サンプルコードを読み込みました！', 'info');
             }
         });
@@ -829,17 +842,21 @@ track verse2_descant {
 
         showStatus('コンパイル中...', 'info');
         compileBtn.disabled = true;
+        playBtn.disabled = true;
+        stopBtn.disabled = true;
+        setDownloadButtonsEnabled(false);
 
         try {
             compiledAudio = await compiler.compile(code);
-            
+            compiledSource = code;
+
             let outputText = 'コンパイル成功！\n';
             outputText += `テンポ: ${compiler.settings.tempo} BPM\n`;
             outputText += `波形: ${compiler.settings.wave}\n`;
-            outputText += `音量: ${compiler.settings.volume}\n\n`;
+            outputText += `音量: ${compiler.settings.volume}\n`;
+            outputText += '保存形式: MIDI / MP3\n\n';
 
             if (typeof compiledAudio === 'object' && !(compiledAudio instanceof Float32Array)) {
-                // Multitrack
                 outputText += 'マルチトラック構成が生成されました:\n';
                 const tracks = Object.keys(compiledAudio);
                 tracks.forEach(track => {
@@ -848,7 +865,6 @@ track verse2_descant {
                     outputText += `- ${track}: ${samples} サンプル (${duration}秒)\n`;
                 });
 
-                // Show track info
                 trackList.innerHTML = '';
                 tracks.forEach(track => {
                     const li = document.createElement('li');
@@ -859,7 +875,6 @@ track verse2_descant {
                 });
                 trackInfo.style.display = 'block';
             } else {
-                // Single track
                 const samples = compiledAudio.length;
                 const duration = (samples / 44100).toFixed(2);
                 outputText += `シングルトラック: ${samples} サンプル (${duration}秒)\n`;
@@ -867,13 +882,17 @@ track verse2_descant {
             }
 
             output.textContent = outputText;
-            showStatus('コンパイル成功！再生準備完了。', 'success');
+            showStatus('コンパイル成功！再生と保存の準備ができました。', 'success');
             playBtn.disabled = false;
+            setDownloadButtonsEnabled(true);
 
         } catch (error) {
+            compiledAudio = null;
+            compiledSource = '';
             output.textContent = `コンパイルエラー:\n${error.message}\n\nスタックトレース:\n${error.stack}`;
             showStatus(`コンパイル失敗: ${error.message}`, 'error');
             playBtn.disabled = true;
+            setDownloadButtonsEnabled(false);
             trackInfo.style.display = 'none';
         }
 
@@ -915,16 +934,92 @@ track verse2_descant {
             if (compiler && compiler.stop) {
                 compiler.stop();
             }
-        }
-        catch (error) {
+        } catch (error) {
             console.warn('再生停止エラー:', error);
         }
-        
+
         isPlaying = false;
         playBtn.disabled = false;
         stopBtn.disabled = true;
         showStatus('再生を停止しました。', 'info');
     });
+
+    downloadMidiBtn.addEventListener('click', () => {
+        if (!compiledSource) {
+            showStatus('まずコンパイルしてください！', 'error');
+            return;
+        }
+
+        try {
+            const midiBytes = compiler.buildMidiFile(compiledSource);
+            downloadBlob(
+                new Blob([midiBytes], { type: 'audio/midi' }),
+                buildExportFilename('mid')
+            );
+            showStatus('MIDIを書き出しました。', 'success');
+        } catch (error) {
+            showStatus(`MIDI書き出し失敗: ${error.message}`, 'error');
+        }
+    });
+
+    downloadMp3Btn.addEventListener('click', () => {
+        if (!compiledAudio) {
+            showStatus('まずコンパイルしてください！', 'error');
+            return;
+        }
+
+        downloadMp3Btn.disabled = true;
+        showStatus('MP3を書き出し中...', 'info');
+
+        try {
+            const mp3Blob = compiler.audioDataToMp3Blob(compiledAudio);
+            downloadBlob(mp3Blob, buildExportFilename('mp3'));
+            showStatus('MP3を書き出しました。', 'success');
+        } catch (error) {
+            showStatus(`MP3書き出し失敗: ${error.message}`, 'error');
+        }
+
+        downloadMp3Btn.disabled = false;
+    });
+
+    function setDownloadButtonsEnabled(enabled) {
+        downloadMidiBtn.disabled = !enabled;
+        downloadMp3Btn.disabled = !enabled;
+    }
+
+    function invalidateCompiledOutput() {
+        compiledAudio = null;
+        compiledSource = '';
+        playBtn.disabled = true;
+        stopBtn.disabled = true;
+        setDownloadButtonsEnabled(false);
+        trackInfo.style.display = 'none';
+    }
+
+    function buildExportFilename(extension) {
+        const now = new Date();
+        const stamp = [
+            now.getFullYear(),
+            String(now.getMonth() + 1).padStart(2, '0'),
+            String(now.getDate()).padStart(2, '0'),
+            '-',
+            String(now.getHours()).padStart(2, '0'),
+            String(now.getMinutes()).padStart(2, '0'),
+            String(now.getSeconds()).padStart(2, '0')
+        ].join('');
+        return `uzume-${stamp}.${extension}`;
+    }
+
+    function downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
 
     function showStatus(message, type) {
         statusMessage.textContent = message;

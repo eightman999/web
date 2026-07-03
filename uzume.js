@@ -1115,6 +1115,12 @@ class UzumeAudioEngine {
     }
 
     noteToFrequency(note) {
+        const midi = this.noteToMidi(note);
+        if (midi === null) return 440; // Default A4
+        return 440 * Math.pow(2, (midi - 69) / 12);
+    }
+
+    noteToMidi(note) {
         const noteMap = {
             'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3,
             'E': 4, 'F': 5, 'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8,
@@ -1122,14 +1128,14 @@ class UzumeAudioEngine {
         };
 
         const match = note.match(/([A-G][#b]?)([0-9])/);
-        if (!match) return 440; // Default A4
+        if (!match) return null;
 
         const noteName = match[1];
-        const octave = parseInt(match[2]);
+        const octave = parseInt(match[2], 10);
         const semitone = noteMap[noteName];
-        const midi = (octave + 1) * 12 + semitone;
+        if (semitone === undefined) return null;
 
-        return 440 * Math.pow(2, (midi - 69) / 12);
+        return (octave + 1) * 12 + semitone;
     }
 
     /**
@@ -1308,13 +1314,22 @@ const DYNAMIC_VOLUME_MAP = {
     'ff':  1.0
 };
 
+const MIDI_PPQ = 480;
+const MIDI_TRACK_CHANNELS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15];
+const ARPEGGIO_DELAY_SECONDS = 0.05;
+
 // ========================================
 // Compiler
 // ========================================
 
 class UzumeCompiler {
     constructor() {
-        this.settings = {
+        this.audioEngine = new UzumeAudioEngine();
+        this.resetCompositionState();
+    }
+
+    createDefaultSettings() {
+        return {
             tempo: 120,
             beat: [4, 4],
             volume: 80,
@@ -1322,32 +1337,35 @@ class UzumeCompiler {
             scale: null,  // P3-7
             root:  'C'    // P3-7
         };
+    }
+
+    resetCompositionState() {
+        this.settings = this.createDefaultSettings();
         this.measures = new Map();
         this.measureSettings = new Map();
         this.measureDynamic = new Map(); // P2-5: .cre/.dec/.arpeggio
         this.tracks = new Map();
         this.customChords = {}; // P3-8
         this.tuplets = new Map(); // P3-6
-        this.audioEngine = new UzumeAudioEngine();
     }
 
     async compile(source) {
+        this.resetCompositionState();
         const parser = new UzumeParser();
         const ast = parser.parse(source);
 
         // カスタムコードをコンパイラに引き継ぐ
-        this.customChords = parser.customChords;
+        this.customChords = { ...parser.customChords };
 
-        const hasTrackcs = ast.statements.some(stmt => stmt instanceof TrackDefinition);
-        if (hasTrackcs) {
+        const hasTracks = ast.statements.some(stmt => stmt instanceof TrackDefinition);
+        if (hasTracks) {
             return await this.compileMultitrack(ast);
         } else {
             return await this.compileSingleTrack(ast);
         }
     }
 
-    async compileSingleTrack(ast) {
-        // First pass: collect settings and definitions
+    prepareProgram(ast) {
         const addDirectives = []; // AddStatement を一時保存
         for (const stmt of ast.statements) {
             if (stmt instanceof SetStatement) {
@@ -1370,6 +1388,10 @@ class UzumeCompiler {
             }
         }
 
+        return addDirectives;
+    }
+
+    applyAddDirectives(addDirectives) {
         // add stc/leg/acc/ten(target[idx]) の事後適用
         // 全小節定義が揃った後で適用するため、First pass の後で処理する。
         for (const dir of addDirectives) {
@@ -1396,26 +1418,101 @@ class UzumeCompiler {
                 console.warn(`add: ${dir.target}[${dir.index}] out of range (len=${notes.length})`);
             }
         }
+    }
 
-        // Second pass: generate audio
-        const audioBuffers = [];
-        for (const stmt of ast.statements) {
+    expandStatementsToReadBlocks(statements) {
+        const readBlocks = [];
+        for (const stmt of statements) {
             if (stmt instanceof ReadStatement) {
-                const buffer = await this.renderMeasures(stmt.measureNames);
-                audioBuffers.push(buffer);
+                readBlocks.push(stmt.measureNames);
             } else if (stmt instanceof LoopStatement) {
                 for (let i = 0; i < stmt.count; i++) {
-                    for (const bodyStmt of stmt.body) {
-                        if (bodyStmt instanceof ReadStatement) {
-                            const buffer = await this.renderMeasures(bodyStmt.measureNames);
-                            audioBuffers.push(buffer);
-                        }
-                    }
+                    readBlocks.push(...this.expandStatementsToReadBlocks(stmt.body));
                 }
             }
         }
+        return readBlocks;
+    }
+
+    async compileSingleTrack(ast) {
+        const addDirectives = this.prepareProgram(ast);
+        this.applyAddDirectives(addDirectives);
+
+        // Second pass: generate audio
+        const audioBuffers = [];
+        const readBlocks = this.expandStatementsToReadBlocks(ast.statements);
+        for (const measureNames of readBlocks) {
+            const buffer = await this.renderMeasures(measureNames);
+            audioBuffers.push(buffer);
+        }
 
         return this.combineBuffers(audioBuffers);
+    }
+
+    buildMidiFile(source) {
+        this.resetCompositionState();
+        const parser = new UzumeParser();
+        const ast = parser.parse(source);
+
+        this.customChords = { ...parser.customChords };
+
+        const hasTracks = ast.statements.some(stmt => stmt instanceof TrackDefinition);
+        if (hasTracks) {
+            return this.buildMultitrackMidi(ast);
+        }
+        return this.buildSingleTrackMidi(ast, 'Uzume', 0);
+    }
+
+    buildSingleTrackMidi(ast, trackName = 'Uzume', channel = 0) {
+        const track = this.buildPreparedMidiTrack(ast, trackName, channel);
+        return this.encodeMidiFile(
+            [track],
+            this.settings.tempo || 120,
+            this.settings.beat || [4, 4]
+        );
+    }
+
+    buildPreparedMidiTrack(ast, trackName, channel) {
+        const addDirectives = this.prepareProgram(ast);
+        this.applyAddDirectives(addDirectives);
+
+        const readBlocks = this.expandStatementsToReadBlocks(ast.statements);
+        const timeline = this.collectReadBlocksTimeline(readBlocks, channel);
+
+        return {
+            name: trackName,
+            channel,
+            events: timeline.events
+        };
+    }
+
+    buildMultitrackMidi(ast) {
+        const tracks = [];
+        let trackIndex = 0;
+
+        for (const stmt of ast.statements) {
+            if (stmt instanceof SetStatement) {
+                this.applySetStatement(stmt);
+            } else if (stmt instanceof TrackDefinition) {
+                const trackCompiler = new UzumeCompiler();
+                trackCompiler.settings = { ...trackCompiler.settings, ...this.settings, ...stmt.settings };
+                trackCompiler.customChords = { ...this.customChords };
+                const trackProgram = new Program(stmt.statements);
+                const midiTrack = trackCompiler.buildPreparedMidiTrack(
+                    trackProgram,
+                    stmt.name,
+                    this.getMidiChannel(trackIndex)
+                );
+                tracks.push(midiTrack);
+                trackIndex++;
+            }
+        }
+
+        return this.encodeMidiFile(
+            tracks,
+            this.settings.tempo || 120,
+            this.settings.beat || [4, 4]
+        );
     }
 
     applySetStatement(stmt) {
@@ -1449,6 +1546,521 @@ class UzumeCompiler {
             }
         }
         return tracks;
+    }
+
+    getMidiChannel(trackIndex) {
+        return MIDI_TRACK_CHANNELS[trackIndex % MIDI_TRACK_CHANNELS.length];
+    }
+
+    getBeatDurationSeconds(settings) {
+        return 60 / (settings.tempo || 120);
+    }
+
+    getDurationSeconds(durationInBeats, settings) {
+        return durationInBeats * this.getBeatDurationSeconds(settings);
+    }
+
+    calculateNoteVolume(note, settings) {
+        let volume = (settings.volume || 80) / 127;
+        if (note.dynamic && DYNAMIC_VOLUME_MAP[note.dynamic] !== undefined) {
+            volume = DYNAMIC_VOLUME_MAP[note.dynamic];
+        }
+        if (note.articulation === 'acc') {
+            volume = Math.min(1.0, volume * 1.3);
+        }
+        return volume;
+    }
+
+    calculateMidiVelocity(note, settings) {
+        const velocity = Math.round(this.calculateNoteVolume(note, settings) * 127);
+        return Math.max(1, Math.min(127, velocity));
+    }
+
+    resolveScaleDegreeNote(note, settings) {
+        const scaleName = settings.scale;
+        const rootNote = settings.root || 'C';
+        const scaleIntervals = SCALE_DEFINITIONS[scaleName] || SCALE_DEFINITIONS['major'];
+        const pitch = this.audioEngine.scaleDegreeToNote(
+            note.degree, note.octave, scaleIntervals, rootNote
+        );
+        return new Note(pitch, note.duration, note.articulation, note.dynamic);
+    }
+
+    collectReadBlocksTimeline(readBlocks, channel) {
+        const events = [];
+        let currentTime = 0;
+
+        for (const measureNames of readBlocks) {
+            const timeline = this.collectReadTimeline(measureNames, currentTime, channel);
+            events.push(...timeline.events);
+            currentTime += timeline.duration;
+        }
+
+        return { events, duration: currentTime };
+    }
+
+    collectReadTimeline(measureNames, startTime, channel) {
+        if (measureNames.length === 1) {
+            return this.collectMeasureTimeline(measureNames[0], startTime, channel);
+        }
+
+        const events = [];
+        let duration = 0;
+        for (const measureName of measureNames) {
+            const timeline = this.collectMeasureTimeline(measureName, startTime, channel);
+            events.push(...timeline.events);
+            duration = Math.max(duration, timeline.duration);
+        }
+        return { events, duration };
+    }
+
+    collectMeasureTimeline(measureName, startTime, channel) {
+        if (!this.measures.has(measureName)) {
+            if (this.tuplets.has(measureName)) {
+                return this.collectTupletTimeline(this.tuplets.get(measureName), this.settings, startTime, channel);
+            }
+            console.warn(`Measure ${measureName} not found`);
+            return { events: [], duration: 0 };
+        }
+
+        const notes = this.measures.get(measureName);
+        const settings = this.measureSettings.get(measureName) || this.settings;
+        const dynamic = this.measureDynamic.get(measureName) || null;
+
+        if (dynamic === '.arpeggio') {
+            return this.collectArpeggioTimeline(notes, settings, startTime, channel);
+        }
+
+        const events = [];
+        let currentTime = startTime;
+
+        for (let i = 0; i < notes.length; i++) {
+            const note = notes[i];
+            let noteSettings = settings;
+            if (dynamic === '.cre' || dynamic === '.dec') {
+                const ratio = notes.length > 1 ? i / (notes.length - 1) : 0;
+                const crescFactor = dynamic === '.cre' ? ratio : (1 - ratio);
+                const volScale = 0.4 + crescFactor * 0.8;
+                noteSettings = { ...settings, volume: (settings.volume || 80) * volScale };
+            }
+
+            const timeline = this.collectNodeTimeline(note, noteSettings, currentTime, channel);
+            events.push(...timeline.events);
+            currentTime += timeline.duration;
+        }
+
+        return {
+            events,
+            duration: currentTime - startTime
+        };
+    }
+
+    collectTupletReferenceTimeline(ref, settings, startTime, channel) {
+        if (ref.inlineDef) {
+            return this.collectTupletTimeline(ref.inlineDef, settings, startTime, channel);
+        }
+        if (ref.name && this.tuplets.has(ref.name)) {
+            return this.collectTupletTimeline(this.tuplets.get(ref.name), settings, startTime, channel);
+        }
+        console.warn(`Tuplet ${ref.name} not found`);
+        return { events: [], duration: 0 };
+    }
+
+    collectTupletTimeline(tupletDef, settings, startTime, channel) {
+        const notes = tupletDef.notes || [];
+        let writtenTotal = 0;
+        for (const note of notes) {
+            writtenTotal += this.noteDurationBeats(note);
+        }
+        const scale = writtenTotal > 0 ? (tupletDef.inBeats / writtenTotal) : 1;
+
+        const events = [];
+        let currentTime = startTime;
+
+        for (const note of notes) {
+            const scaled = this.scaleNoteDuration(note, scale);
+            const timeline = this.collectNodeTimeline(scaled, settings, currentTime, channel);
+            events.push(...timeline.events);
+            currentTime += timeline.duration;
+        }
+
+        return {
+            events,
+            duration: currentTime - startTime
+        };
+    }
+
+    collectArpeggioTimeline(notes, settings, startTime, channel) {
+        const events = [];
+        let currentTime = startTime;
+
+        for (const note of notes) {
+            const timeline = this.collectArpeggiatedNodeTimeline(
+                note,
+                settings,
+                currentTime,
+                channel,
+                ARPEGGIO_DELAY_SECONDS
+            );
+            events.push(...timeline.events);
+            currentTime += timeline.duration;
+        }
+
+        return {
+            events,
+            duration: currentTime - startTime
+        };
+    }
+
+    collectArpeggiatedNodeTimeline(node, settings, startTime, channel, arpDelaySeconds) {
+        if (node instanceof CodeChord) {
+            const chordNotes = this.lookupChord(node.chordName);
+            if (!chordNotes) {
+                console.warn(`Chord ${node.chordName} not found`);
+                return { events: [], duration: 0 };
+            }
+
+            const duration = this.getDurationSeconds(node.duration, settings);
+            const events = [];
+            for (let i = 0; i < chordNotes.length; i++) {
+                const syntheticNote = new Note(chordNotes[i], node.duration);
+                const timeline = this.collectNodeTimeline(
+                    syntheticNote,
+                    settings,
+                    startTime + (arpDelaySeconds * i),
+                    channel
+                );
+                events.push(...timeline.events);
+            }
+            return {
+                events,
+                duration: duration + (arpDelaySeconds * chordNotes.length)
+            };
+        }
+
+        if (node instanceof Chord) {
+            const events = [];
+            let maxDuration = 0;
+            for (let i = 0; i < node.notes.length; i++) {
+                const timeline = this.collectNodeTimeline(
+                    node.notes[i],
+                    settings,
+                    startTime + (arpDelaySeconds * i),
+                    channel
+                );
+                events.push(...timeline.events);
+                maxDuration = Math.max(maxDuration, timeline.duration);
+            }
+            return {
+                events,
+                duration: maxDuration + (arpDelaySeconds * node.notes.length)
+            };
+        }
+
+        if (node instanceof Note || node instanceof Rest) {
+            return this.collectNodeTimeline(node, settings, startTime, channel);
+        }
+
+        return { events: [], duration: 0 };
+    }
+
+    collectNodeTimeline(node, settings, startTime, channel) {
+        if (node instanceof Note) {
+            return this.collectNoteTimeline(node, settings, startTime, channel);
+        }
+        if (node instanceof Rest) {
+            return this.collectRestTimeline(node, settings);
+        }
+        if (node instanceof CodeChord) {
+            return this.collectCodeChordTimeline(node, settings, startTime, channel);
+        }
+        if (node instanceof Chord) {
+            return this.collectChordTimeline(node, settings, startTime, channel);
+        }
+        if (node instanceof MeasureReference) {
+            return this.collectMeasureTimeline(node.measureName, startTime, channel);
+        }
+        if (node instanceof ScaleDegreeNote) {
+            const resolved = this.resolveScaleDegreeNote(node, settings);
+            return this.collectNoteTimeline(resolved, settings, startTime, channel);
+        }
+        if (node instanceof TupletReference) {
+            return this.collectTupletReferenceTimeline(node, settings, startTime, channel);
+        }
+        return { events: [], duration: 0 };
+    }
+
+    collectNoteTimeline(note, settings, startTime, channel) {
+        const duration = this.getDurationSeconds(note.duration, settings);
+        const midiNote = this.audioEngine.noteToMidi(note.pitch);
+        if (midiNote === null) {
+            console.warn(`Invalid MIDI pitch: ${note.pitch}`);
+            return { events: [], duration };
+        }
+
+        const velocity = this.calculateMidiVelocity(note, settings);
+        return {
+            events: [
+                { type: 'noteOn', time: startTime, note: midiNote, velocity, channel },
+                { type: 'noteOff', time: startTime + duration, note: midiNote, velocity: 0, channel }
+            ],
+            duration
+        };
+    }
+
+    collectRestTimeline(rest, settings) {
+        return {
+            events: [],
+            duration: this.getDurationSeconds(rest.duration, settings)
+        };
+    }
+
+    collectCodeChordTimeline(codeChord, settings, startTime, channel) {
+        const chordNotes = this.lookupChord(codeChord.chordName);
+        if (!chordNotes) {
+            console.warn(`Chord ${codeChord.chordName} not found`);
+            return { events: [], duration: 0 };
+        }
+
+        const duration = this.getDurationSeconds(codeChord.duration, settings);
+        const events = [];
+        for (const pitch of chordNotes) {
+            const syntheticNote = new Note(pitch, codeChord.duration);
+            const timeline = this.collectNoteTimeline(syntheticNote, settings, startTime, channel);
+            events.push(...timeline.events);
+        }
+
+        return { events, duration };
+    }
+
+    collectChordTimeline(chord, settings, startTime, channel) {
+        const events = [];
+        let maxDuration = 0;
+        for (const note of chord.notes) {
+            let timeline = { events: [], duration: 0 };
+            if (note instanceof Note) {
+                timeline = this.collectNoteTimeline(note, settings, startTime, channel);
+            } else if (note instanceof ScaleDegreeNote) {
+                const resolved = this.resolveScaleDegreeNote(note, settings);
+                timeline = this.collectNoteTimeline(resolved, settings, startTime, channel);
+            }
+            events.push(...timeline.events);
+            maxDuration = Math.max(maxDuration, timeline.duration);
+        }
+        return { events, duration: maxDuration };
+    }
+
+    encodeMidiFile(tracks, tempo, beat) {
+        const conductorTrack = this.encodeMidiConductorTrack(tempo, beat);
+        const noteTracks = tracks.map(track => this.encodeMidiNoteTrack(track, tempo));
+        const header = this.createMidiHeader(noteTracks.length + 1, MIDI_PPQ);
+
+        return this.concatUint8Arrays([header, conductorTrack, ...noteTracks]);
+    }
+
+    encodeMidiConductorTrack(tempo, beat) {
+        const numerator = Array.isArray(beat) ? beat[0] : 4;
+        const denominator = Array.isArray(beat) ? beat[1] : 4;
+        const denominatorPower = denominator > 0 ? Math.round(Math.log2(denominator)) : 2;
+
+        const bytes = [];
+        bytes.push(...this.encodeTextMetaEvent(0, 0x03, 'Uzume Export'));
+        bytes.push(...this.encodeTempoMetaEvent(0, tempo || 120));
+        bytes.push(...this.encodeTimeSignatureMetaEvent(0, numerator || 4, denominatorPower));
+        bytes.push(...this.encodeEndOfTrackEvent(0));
+
+        return this.wrapMidiTrack(bytes);
+    }
+
+    encodeMidiNoteTrack(track, tempo) {
+        const bytes = [];
+        const ticksPerSecond = (MIDI_PPQ * (tempo || 120)) / 60;
+        const events = [...track.events].sort((left, right) => {
+            if (left.time !== right.time) return left.time - right.time;
+            if (left.type !== right.type) return left.type === 'noteOff' ? -1 : 1;
+            return left.note - right.note;
+        });
+
+        bytes.push(...this.encodeTextMetaEvent(0, 0x03, track.name || 'Track'));
+
+        let lastTick = 0;
+        for (const event of events) {
+            const tick = Math.max(0, Math.round(event.time * ticksPerSecond));
+            const delta = tick - lastTick;
+            bytes.push(...this.encodeVarLength(delta));
+            if (event.type === 'noteOn') {
+                bytes.push(0x90 | (event.channel & 0x0F), event.note & 0x7F, event.velocity & 0x7F);
+            } else {
+                bytes.push(0x80 | (event.channel & 0x0F), event.note & 0x7F, 0);
+            }
+            lastTick = tick;
+        }
+
+        bytes.push(...this.encodeEndOfTrackEvent(0));
+        return this.wrapMidiTrack(bytes);
+    }
+
+    encodeTextMetaEvent(delta, metaType, text) {
+        const textBytes = this.stringToBytes(text);
+        return [
+            ...this.encodeVarLength(delta),
+            0xFF,
+            metaType,
+            ...this.encodeVarLength(textBytes.length),
+            ...textBytes
+        ];
+    }
+
+    encodeTempoMetaEvent(delta, tempo) {
+        const bpm = Math.max(1, Math.round(tempo || 120));
+        const microsecondsPerQuarter = Math.round(60000000 / bpm);
+        return [
+            ...this.encodeVarLength(delta),
+            0xFF,
+            0x51,
+            0x03,
+            (microsecondsPerQuarter >> 16) & 0xFF,
+            (microsecondsPerQuarter >> 8) & 0xFF,
+            microsecondsPerQuarter & 0xFF
+        ];
+    }
+
+    encodeTimeSignatureMetaEvent(delta, numerator, denominatorPower) {
+        return [
+            ...this.encodeVarLength(delta),
+            0xFF,
+            0x58,
+            0x04,
+            numerator & 0xFF,
+            denominatorPower & 0xFF,
+            24,
+            8
+        ];
+    }
+
+    encodeEndOfTrackEvent(delta) {
+        return [...this.encodeVarLength(delta), 0xFF, 0x2F, 0x00];
+    }
+
+    encodeVarLength(value) {
+        let buffer = value & 0x7F;
+        const bytes = [];
+        while ((value >>= 7) > 0) {
+            buffer <<= 8;
+            buffer |= ((value & 0x7F) | 0x80);
+        }
+        while (true) {
+            bytes.push(buffer & 0xFF);
+            if (buffer & 0x80) {
+                buffer >>= 8;
+            } else {
+                break;
+            }
+        }
+        return bytes;
+    }
+
+    createMidiHeader(trackCount, ppq) {
+        return this.concatUint8Arrays([
+            this.stringToUint8Array('MThd'),
+            this.uint32ToBytes(6),
+            this.uint16ToBytes(1),
+            this.uint16ToBytes(trackCount),
+            this.uint16ToBytes(ppq)
+        ]);
+    }
+
+    wrapMidiTrack(bytes) {
+        return this.concatUint8Arrays([
+            this.stringToUint8Array('MTrk'),
+            this.uint32ToBytes(bytes.length),
+            Uint8Array.from(bytes)
+        ]);
+    }
+
+    stringToBytes(text) {
+        const bytes = [];
+        for (let i = 0; i < text.length; i++) {
+            bytes.push(text.charCodeAt(i) & 0x7F);
+        }
+        return bytes;
+    }
+
+    stringToUint8Array(text) {
+        return Uint8Array.from(this.stringToBytes(text));
+    }
+
+    uint16ToBytes(value) {
+        return Uint8Array.from([
+            (value >> 8) & 0xFF,
+            value & 0xFF
+        ]);
+    }
+
+    uint32ToBytes(value) {
+        return Uint8Array.from([
+            (value >> 24) & 0xFF,
+            (value >> 16) & 0xFF,
+            (value >> 8) & 0xFF,
+            value & 0xFF
+        ]);
+    }
+
+    concatUint8Arrays(chunks) {
+        const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+        const result = new Uint8Array(totalLength);
+        let offset = 0;
+        for (const chunk of chunks) {
+            result.set(chunk, offset);
+            offset += chunk.length;
+        }
+        return result;
+    }
+
+    normalizeAudioData(audioData) {
+        if (audioData instanceof Float32Array) {
+            return audioData;
+        }
+        if (audioData && typeof audioData === 'object') {
+            return this.mixBuffers(Object.values(audioData));
+        }
+        return new Float32Array(0);
+    }
+
+    floatTo16BitPCM(buffer) {
+        const pcm = new Int16Array(buffer.length);
+        for (let i = 0; i < buffer.length; i++) {
+            const sample = Math.max(-1, Math.min(1, buffer[i]));
+            pcm[i] = sample < 0 ? Math.round(sample * 0x8000) : Math.round(sample * 0x7FFF);
+        }
+        return pcm;
+    }
+
+    audioDataToMp3Blob(audioData, bitrate = 128) {
+        if (typeof lamejs === 'undefined' || typeof lamejs.Mp3Encoder !== 'function') {
+            throw new Error('MP3 encoder is not loaded.');
+        }
+
+        const mixedBuffer = this.normalizeAudioData(audioData);
+        const pcm = this.floatTo16BitPCM(mixedBuffer);
+        const encoder = new lamejs.Mp3Encoder(1, this.audioEngine.sampleRate, bitrate);
+        const chunks = [];
+        const blockSize = 1152;
+
+        for (let i = 0; i < pcm.length; i += blockSize) {
+            const monoChunk = pcm.subarray(i, i + blockSize);
+            const chunk = encoder.encodeBuffer(monoChunk);
+            if (chunk.length > 0) {
+                chunks.push(new Uint8Array(chunk));
+            }
+        }
+
+        const finalChunk = encoder.flush();
+        if (finalChunk.length > 0) {
+            chunks.push(new Uint8Array(finalChunk));
+        }
+
+        return new Blob(chunks, { type: 'audio/mpeg' });
     }
 
     async renderMeasures(measureNames) {
@@ -1598,7 +2210,7 @@ class UzumeCompiler {
     // 各コードノートを時間差で鳴らす
     async renderArpeggio(notes, settings) {
         const buffers = [];
-        const arpDelay = 0.05; // 各音の遅延 (秒)
+        const arpDelay = ARPEGGIO_DELAY_SECONDS; // 各音の遅延 (秒)
 
         for (const note of notes) {
             if (note instanceof CodeChord) {
@@ -1651,20 +2263,8 @@ class UzumeCompiler {
 
     async renderNote(note, settings) {
         const frequency = this.audioEngine.noteToFrequency(note.pitch);
-        const tempo = settings.tempo || 120;
-        const beatDuration = 60 / tempo;
-        const durationInSeconds = note.duration * beatDuration;
-
-        // P2-3: DYNAMIC によるvolume計算
-        let volume = (settings.volume || 80) / 127;
-        if (note.dynamic && DYNAMIC_VOLUME_MAP[note.dynamic] !== undefined) {
-            volume = DYNAMIC_VOLUME_MAP[note.dynamic];
-        }
-
-        // P2-4: accent は音量を1.3倍
-        if (note.articulation === 'acc') {
-            volume = Math.min(1.0, volume * 1.3);
-        }
+        const durationInSeconds = this.getDurationSeconds(note.duration, settings);
+        const volume = this.calculateNoteVolume(note, settings);
 
         return this.audioEngine.generateWaveform(
             frequency,
@@ -1677,20 +2277,12 @@ class UzumeCompiler {
 
     // P3-7: スケール度数ノートのレンダリング
     async renderScaleDegreeNote(note, settings) {
-        const scaleName = settings.scale;
-        const rootNote = settings.root || 'C';
-        const scaleIntervals = SCALE_DEFINITIONS[scaleName] || SCALE_DEFINITIONS['major'];
-        const pitch = this.audioEngine.scaleDegreeToNote(
-            note.degree, note.octave, scaleIntervals, rootNote
-        );
-        const syntheticNote = new Note(pitch, note.duration, note.articulation, note.dynamic);
+        const syntheticNote = this.resolveScaleDegreeNote(note, settings);
         return await this.renderNote(syntheticNote, settings);
     }
 
     async renderRest(rest, settings) {
-        const tempo = settings.tempo || 120;
-        const beatDuration = 60 / tempo;
-        const durationInSeconds = rest.duration * beatDuration;
+        const durationInSeconds = this.getDurationSeconds(rest.duration, settings);
         const samples = Math.floor(durationInSeconds * this.audioEngine.sampleRate);
         return new Float32Array(samples);
     }

@@ -706,6 +706,54 @@ await runTest('REGRESSION: 接頭辞なし音名 + 和音 + 休符', async funct
 });
 
 // ================================================================
+// Export: MIDI
+// ================================================================
+await runTest('EXPORT: MIDIファイルを生成できる', async function() {
+    const compiler = new UzumeCompiler();
+    const midi = compiler.buildMidiFile([
+        'set tempo(120);',
+        'set wave(sine);',
+        'melody = measure[C4-1, R-1, G4-1];',
+        'read(melody);'
+    ].join('\n'));
+
+    assert(midi instanceof Uint8Array, 'Uint8Array returned');
+    assert(String.fromCharCode.apply(null, Array.from(midi.slice(0, 4))) === 'MThd',
+        'SMF header starts with MThd');
+
+    const trackCount = (midi[10] << 8) | midi[11];
+    assert(trackCount === 2, 'single-track export has conductor + note track', 'tracks=' + trackCount);
+
+    const hasC4NoteOn = midi.some((value, index) => value === 0x90 && midi[index + 1] === 60);
+    const hasG4NoteOn = midi.some((value, index) => value === 0x90 && midi[index + 1] === 67);
+    assert(hasC4NoteOn, 'contains C4 note-on event');
+    assert(hasG4NoteOn, 'contains G4 note-on event');
+});
+
+await runTest('EXPORT: マルチトラックMIDIはトラック数を保持する', async function() {
+    const compiler = new UzumeCompiler();
+    const midi = compiler.buildMidiFile([
+        'set tempo(96);',
+        'track lead {',
+        '    motif = measure[C5-1, E5-1];',
+        '    read(motif);',
+        '}',
+        'track bass {',
+        '    line = measure[C3-2];',
+        '    read(line);',
+        '}'
+    ].join('\n'));
+
+    const trackCount = (midi[10] << 8) | midi[11];
+    assert(trackCount === 3, 'multitrack export has conductor + 2 tracks', 'tracks=' + trackCount);
+
+    const hasLeadChannel = midi.some((value, index) => value === 0x90 && midi[index + 1] === 72);
+    const hasBassChannel = midi.some((value, index) => value === 0x91 && midi[index + 1] === 48);
+    assert(hasLeadChannel, 'lead track note exported on channel 1');
+    assert(hasBassChannel, 'bass track note exported on channel 2');
+});
+
+// ================================================================
 // 結果サマリ
 // ================================================================
 console.log('\n========================================');
