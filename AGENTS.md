@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
 
 ## Project Overview
 
@@ -66,60 +66,85 @@ The `uzume.js` file contains a complete domain-specific language for music compo
 - The Uzume compiler is a sophisticated music programming system embedded within the site
 - All templates maintain consistent visual themes while providing different UI experiences
 
-## Multi-agent orchestration workflow
+---
 
-You are the technical lead and orchestrator.
+# External Agent Policy
 
-Primary responsibilities:
-- Plan
-- Decompose
-- Delegate
-- Integrate
-- Keep the main context small
-- Prefer concise summaries over dumping logs into the main conversation
+This repository uses multiple coding agents.
 
-Model routing:
-- Fable 5: orchestration, planning, integration, final decisions
-- deep-reasoner / Opus: architecture, hard debugging, algorithmic reasoning, high-risk design choices
-- fast-worker / Sonnet: mechanical edits, boilerplate, tests, formatting, simple refactors
-- Codex: peer engineer, rescue, independent second opinion, adversarial review
-- Agy / Antigravity CLI: read-only long-context audit, docs/spec consistency, log compression
-- OpenCode(GLM): secondary implementation lane, usually in a separate git worktree
+## Agy / Antigravity CLI
 
-Effort policy:
-- Use Fable high/xhigh by default
-- Use Fable max only for final synthesis, blocked debugging, or irreversible decisions
-- Use Opus xhigh/max only for genuinely reasoning-heavy tasks
-- Use Sonnet medium/high for mechanical work
-- Use OpenCode(GLM) for scoped implementation, not final authority
+Default role:
+- read-only audit
+- requirements checking
+- documentation consistency
+- long-context scan
+- log and diff compression
 
-Context discipline:
-- Do not flood the main conversation with large file contents, logs, or search output
-- Ask subagents to return:
-  1. conclusion
-  2. evidence
-  3. changed files, if any
-  4. risks
-  5. next action
-- Do not let multiple agents edit the same files concurrently unless isolated worktrees are used
+Default prompt:
 
-High-risk workflow:
-For data loss, migrations, security-sensitive code, concurrency, public APIs, or major architecture:
+```text
+Read the mission, CLAUDE.md, AGENTS.md, README, and relevant docs.
+Do not edit files.
+Return:
+1. conclusion
+2. hidden assumptions
+3. contradictions
+4. affected files
+5. risks
+6. recommended next action
+```
 
-1. Ask deep-reasoner / Opus independently
-2. Ask Codex independently
-3. Ask Agy to check assumptions and documentation consistency
-4. Optionally ask OpenCode(GLM) for an isolated implementation attempt
-5. Fable compares all outputs and chooses the minimal safe path
+Rules:
+- Agy is NOT a primary implementation worker.
+- If Agy must implement something, isolate it in a separate branch/worktree first.
 
-Safety:
-- Do not expose secrets
-- Do not run destructive commands
-- Do not use OpenCode `/share` in private work
-- Do not make broad unrelated refactors
-- Do not change public APIs without explicit approval
+## OpenCode(GLM)
 
-External tool invocation (this environment):
-- Codex / OpenCode / Agy / Gemini は cc-workers MCP (`run_worker` / `start_worker`) 経由でも呼び出せる。
-  長時間ジョブは `start_worker` + `job_status` を使い、メイン会話にログを流さない。
-- 監査・検証・敵対的レビューの定型プロンプトは worker-audit スキルを使う。
+Default role:
+- secondary implementation lane
+- independent patch attempt
+- scoped feature work
+- tests and refactors
+
+Rules:
+- Prefer separate git worktree
+- Keep changes minimal
+- Do not redesign unrelated systems
+- Do not use `/share` (never share private repository content publicly)
+- Return changed files, tests run, risks, and unresolved questions
+
+Suggested worktree flow:
+
+```bash
+git worktree add ../PROJECT-glm -b glm/TASK_NAME
+cd ../PROJECT-glm
+opencode
+```
+
+## Codex
+
+Default role:
+- peer senior engineer
+- rescue
+- adversarial review
+- independent second opinion
+
+Use cases:
+- hard bug
+- design challenge
+- security-sensitive review
+- Claude loop recovery
+- final review before risky merge
+
+Rules:
+- Do not enable an always-on review gate by default.
+- Use Codex on high-risk decisions only when the extra cost is justified.
+
+## Required final report (all external agents)
+
+1. conclusion / approach summary
+2. changed files (if any)
+3. tests run and their actual output
+4. risks
+5. unresolved questions
