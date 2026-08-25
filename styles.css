@@ -1,642 +1,906 @@
-/* --- 全体の設定 --- */
+@import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
+
+/* =========================================================================
+   eightmanのお部屋 — Windows 95 スタイルシート
+   角丸・グラデーション・ドロップシャドウは使わない。
+   立体感はすべて 2px のベベル（outset / inset）で表現する。
+   ========================================================================= */
+
+:root {
+  /* --- 面と陰影 --- */
+  --face:      #c0c0c0;  /* ボタン・ウィンドウの地色 */
+  --face-lt:   #dfdfdf;  /* ベベルの明るい面 */
+  --hi:        #ffffff;  /* ハイライト */
+  --sh:        #808080;  /* シャドウ */
+  --dk:        #000000;  /* 最暗部 */
+  --well:      #ffffff;  /* 入力欄・リスト欄の白 */
+
+  /* --- タイトルバー --- */
+  --title-a:   #000080;
+  --title-b:   #1084d0;
+  --title-fg:  #ffffff;
+  --title-a-i: #808080;  /* 非アクティブ */
+  --title-b-i: #b5b5b5;
+
+  /* --- デスクトップ --- */
+  --desktop:   #008080;
+
+  /* --- 選択色 --- */
+  --sel-bg:    #000080;
+  --sel-fg:    #ffffff;
+
+  /* --- フォント --- */
+  --ui:   'DotGothic16', Tahoma, 'MS Sans Serif', 'MS PGothic', 'Hiragino Kaku Gothic ProN', sans-serif;
+  --body: 'MS PGothic', 'Hiragino Kaku Gothic ProN', Meiryo, 'Yu Gothic', sans-serif;
+  --mono: 'DotGothic16', 'MS Gothic', 'Osaka-Mono', monospace;
+
+  /* --- 寸法 --- */
+  --taskbar-h: 34px;
+}
+
+/* --- ベベル：外側に盛り上がる（ボタン・ウィンドウ） --- */
+.bevel-out,
+.container,
+.box,
+.sidebar-box,
+.omikuji-button,
+.work-links a,
+.book-links a,
+.example-btn,
+input[type="submit"],
+input[type="reset"],
+input[type="button"],
+.sidebar-box.menu ul li a,
+.omikuji-paper,
+.work-item,
+.book-item,
+.poem-item,
+.quote-item {
+  border: 2px solid;
+  border-color: var(--face-lt) var(--dk) var(--dk) var(--face-lt);
+  box-shadow: inset 1px 1px 0 var(--hi), inset -1px -1px 0 var(--sh);
+  border-radius: 0;
+  background-color: var(--face);
+}
+
+/* --- ベベル：内側にへこむ（入力欄・情報表示欄） --- */
+.bevel-in,
+.info-bar,
+select,
+input[type="text"],
+input[type="email"],
+input[type="search"],
+input[type="url"],
+input[type="number"],
+input[type="password"],
+textarea,
+.table-responsive {
+  border: 2px solid;
+  border-color: var(--sh) var(--hi) var(--hi) var(--sh);
+  box-shadow: inset 1px 1px 0 var(--dk), inset -1px -1px 0 var(--face-lt);
+  border-radius: 0;
+}
+
+/* =========================================================================
+   全体
+   ========================================================================= */
+
+* { box-sizing: border-box; }
+
 body {
-  font-family: Tahoma, 'MS Sans Serif', 'MS Gothic', sans-serif; /* Windows 98風フォント */
+  font-family: var(--body);
   font-size: 16px;
-  line-height: 1.5;
+  line-height: 1.7;
   margin: 0;
-  padding: 0;
-  background-color: #E0E0E0; /* シンプルなライトグレー */
-  color: #000000;
-  /* スクロールバーのスタイル (Windows 98風) */
-  scrollbar-width: thin;
-  scrollbar-color: #808080 #F0F0F0;
+  padding: 8px 8px calc(var(--taskbar-h) + 12px);
+  color: var(--dk);
+  /* Win95のデスクトップ。単色ベタ塗り＋控えめなドットパターン */
+  background-color: var(--desktop);
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 1px, transparent 1px 3px);
+  -webkit-text-size-adjust: 100%;
+  scrollbar-width: auto;
+  scrollbar-color: var(--face) #efefef;
 }
 
-body::-webkit-scrollbar {
-  width: 16px;
-  height: 16px;
+/* Win95風スクロールバー（WebKit） */
+::-webkit-scrollbar { width: 17px; height: 17px; }
+::-webkit-scrollbar-track {
+  background: #efefef;
+  background-image: repeating-conic-gradient(var(--hi) 0 25%, #efefef 0 50%);
+  background-size: 2px 2px;
 }
+::-webkit-scrollbar-thumb {
+  background: var(--face);
+  border: 2px solid;
+  border-color: var(--face-lt) var(--dk) var(--dk) var(--face-lt);
+  box-shadow: inset 1px 1px 0 var(--hi), inset -1px -1px 0 var(--sh);
+}
+::-webkit-scrollbar-corner { background: var(--face); }
 
-body::-webkit-scrollbar-track {
-  background: #F0F0F0;
-  border: 1px solid #C0C0C0;
-}
+/* --- リンク --- */
+a { color: #0000c0; text-decoration: underline; }
+a:visited { color: #551a8b; }
+a:hover   { color: #c00000; }
+a:active  { color: #c00000; }
+a:focus-visible { outline: 1px dotted var(--dk); outline-offset: 1px; }
 
-body::-webkit-scrollbar-thumb {
-  background-color: #C0C0C0;
-  border: 1px solid #808080;
-  box-shadow: inset 1px 1px #FFFFFF, inset -1px -1px #808080;
-}
+::selection { background: var(--sel-bg); color: var(--sel-fg); }
 
-/* --- リンクのスタイル --- */
-a {
-  color: #0000FF; /* 標準的な青 */
-  text-decoration: underline;
-  transition: none; /* トランジションを削除 */
-}
-a:visited {
-  color: #800080; /* 標準的な紫 */
-}
-a:hover {
-  color: #FF0000; /* 標準的な赤 */
-  text-decoration: underline;
-  text-shadow: none; /* テキストシャドウを削除 */
-}
-a:active {
-  color: #800080; /* クリック時の色 */
-}
+p { margin: 0 0 0.9em; }
+p:last-child { margin-bottom: 0; }
 
-/* --- 全体を囲むコンテナ --- */
+/* =========================================================================
+   ウィンドウ本体（.container）
+   ========================================================================= */
+
 .container {
-  max-width: 960px;
+  max-width: 980px;
   width: 100%;
-  margin: 20px auto;
-  background: linear-gradient(to bottom, #F0F0F0, #D0D0D0); /* グラデーション */
-  border-style: solid; /* 3Dボーダーから変更 */
-  border-width: 1px;
-  border-color: #A0A0A0;
-  border-radius: 8px; /* 角丸 */
-  padding: 15px;
-  box-sizing: border-box;
-  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3); /* ドロップシャドウ */
+  margin: 0 auto;
+  padding: 0;            /* 中身は .win-inner 相当のブロックで持たせる */
+  background: var(--face);
 }
 
-/* --- ヘッダー --- */
-header {
-  background: linear-gradient(to bottom, #0000CD, #00008B); /* 濃い青のグラデーション */
-  color: #FFFFFF;
-  padding: 10px;
-  text-align: center;
-  border: 1px solid #000066;
-  border-radius: 8px 8px 0 0; /* 上部だけ角丸 */
-  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2); /* ドロップシャドウ */
+/* --- タイトルバー（header をそのまま使う） --- */
+.container > header {
+  background: linear-gradient(90deg, var(--title-a), var(--title-b));
+  color: var(--title-fg);
+  margin: 3px 3px 0;
+  padding: 3px 3px 4px 6px;
+  border: 0;
+  text-align: left;
+  display: flex;
+  flex-wrap: wrap;          /* h1 とボタンを1行目、サブテキストを2行目へ */
+  align-items: center;
+  gap: 6px 8px;
+  min-height: 24px;
 }
 
-header h1 {
-  margin: 0;
-  font-family: 'MS Sans Serif', Arial, sans-serif; /* システムフォント */
-  font-size: 24px;
+.container > header h1 {
+  font-family: var(--ui);
+  font-size: 15px;
   font-weight: bold;
-  text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.5); /* テキストシャドウ */
+  line-height: 1.4;
+  margin: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: none;
+  letter-spacing: 0.02em;
 }
 
-header p {
-  margin: 5px 0 0;
-  font-size: 12px;
+/* タイトルバー直下のサブテキストは、IE風のアドレス欄として凹ませる */
+.container > header p {
+  order: 99;
+  flex: 1 0 100%;
+  margin: 0;
+  padding: 3px 7px;
+  font-size: 13px;
+  font-family: var(--ui);
+  line-height: 1.6;
+  white-space: normal;
+  background: var(--well);
+  color: var(--dk);
+  border: 2px solid;
+  border-color: var(--sh) var(--hi) var(--hi) var(--sh);
+  box-shadow: inset 1px 1px 0 var(--dk), inset -1px -1px 0 var(--face-lt);
+}
+.container > header p a { color: #0000c0; }
+.container > header p a:visited { color: #551a8b; }
+
+/* JSが差し込むタイトルバーのボタン群 */
+.win-controls { display: flex; gap: 2px; flex: 0 0 auto; }
+.win-controls b {
+  width: 20px;
+  height: 18px;
+  display: inline-flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: var(--face);
+  color: var(--dk);
+  border: 2px solid;
+  border-color: var(--face-lt) var(--dk) var(--dk) var(--face-lt);
+  box-shadow: inset 1px 1px 0 var(--hi), inset -1px -1px 0 var(--sh);
+  font: bold 12px var(--ui);
+  line-height: 1;
+  padding-bottom: 3px;
+  user-select: none;
+}
+.win-controls b:active {
+  border-color: var(--sh) var(--hi) var(--hi) var(--sh);
+  box-shadow: inset 1px 1px 0 var(--dk), inset -1px -1px 0 var(--face-lt);
 }
 
-/* --- マーキー（情報バー） --- */
+/* --- メニューバー（JSが差し込む） --- */
+.win-menubar {
+  margin: 1px 3px 0;
+  padding: 2px 4px;
+  font: 13px/1.4 var(--ui);
+  color: var(--dk);
+  border-bottom: 1px solid var(--sh);
+  box-shadow: 0 1px 0 var(--hi);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+.win-menubar span {
+  padding: 2px 7px;
+  cursor: default;
+  user-select: none;
+}
+.win-menubar span:hover { background: var(--sel-bg); color: var(--sel-fg); }
+.win-menubar u { text-decoration: underline; }
+
+/* --- 情報バー（marquee） --- */
 .info-bar {
-  margin-top: 10px;
-  border: 1px solid #FFCC00; /* 黄色のボーダー */
-  border-radius: 5px; /* 角丸 */
-  padding: 3px 0;
-  font-size: 12px;
-  font-weight: normal;
-  color: #333333;
-  background: linear-gradient(to bottom, #FFFFCC, #FFDD88); /* 黄色のグラデーション */
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2); /* インナーシャドウ */
+  display: block;
+  margin: 8px 6px 0;
+  padding: 4px 0;
+  font-family: var(--ui);
+  font-size: 14px;
+  color: #000080;
+  background: #ffffcc;
 }
 
-/* --- メインエリアとサイドバーのレイアウト --- */
+/* =========================================================================
+   本文レイアウト
+   ========================================================================= */
+
 .main-wrapper {
   display: flex;
-  margin-top: 15px;
-  gap: 15px;
+  gap: 8px;
+  margin: 8px 6px;
+  align-items: flex-start;
 }
 
-/* サイドバーを左側に配置 */
-.sidebar {
-  flex: 1;
-  order: 1;
-}
+.sidebar { flex: 0 0 200px; min-width: 0; order: 1; }
+main      { flex: 1 1 auto;  min-width: 0; order: 2; }
 
-main {
-  flex: 3;
-  order: 2;
-}
+/* =========================================================================
+   コンテンツボックス（.box）＝子ウィンドウ
+   ========================================================================= */
 
-/* --- 各コンテンツのボックス --- */
+/* 本文は Explorer のクライアント領域に倣って白地。
+   灰色地のまま長文を読ませるとコントラストが足りないため。 */
 .box {
-  background: linear-gradient(to bottom, #FFFFFF, #E0E0E0); /* 白からグレーへのグラデーション */
-  padding: 15px;
-  margin-bottom: 15px;
-  border: 1px solid #B0B0B0;
-  border-radius: 8px; /* 角丸 */
-  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2); /* ドロップシャドウ */
+  padding: 10px 12px 12px;
+  margin: 0 0 8px;
+  background-color: var(--well);
 }
+.box:last-child { margin-bottom: 0; }
 
 .box h2 {
-  font-size: 18px;
-  color: #FFFFFF;
-  background: linear-gradient(to right, #0066CC, #0099FF); /* 青のグラデーション */
-  padding: 8px 15px;
-  margin: -15px -15px 15px -15px;
-  border-bottom: 1px solid #003366;
-  border-radius: 8px 8px 0 0; /* 上部だけ角丸 */
-  box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.3); /* インナーシャドウ */
+  font-family: var(--ui);
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--title-fg);
+  background: linear-gradient(90deg, var(--title-a), var(--title-b));
+  padding: 4px 8px;
+  margin: -10px -12px 12px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  letter-spacing: 0.02em;
 }
 
-.box ul {
-  padding-left: 20px;
-  margin: 0;
-}
-.box li {
-  margin-bottom: 5px;
+.box h3 {
+  font-family: var(--ui);
+  font-size: 14px;
+  margin: 16px 0 6px;
+  padding: 0 0 3px;
+  border-bottom: 1px solid var(--sh);
+  box-shadow: 0 1px 0 var(--hi);
 }
 
-/* --- サイドバー --- */
+.box ul, .box ol { padding-left: 22px; margin: 0 0 0.9em; }
+.box li { margin-bottom: 4px; }
+
+/* =========================================================================
+   サイドバー
+   ========================================================================= */
+
 .sidebar-box {
-  background: linear-gradient(to bottom, #E0E0E0, #C0C0C0); /* グラデーション */
-  padding: 10px;
-  border: 1px solid #B0B0B0;
-  border-radius: 8px; /* 角丸 */
-  font-size: 12px;
-  margin-bottom: 15px;
-  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2); /* ドロップシャドウ */
+  padding: 8px;
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.6;
 }
+.sidebar-box:last-child { margin-bottom: 0; }
 
 .sidebar-box h3 {
-  font-size: 14px;
-  color: #FFFFFF;
-  background: linear-gradient(to right, #6699CC, #336699); /* 青のグラデーション */
-  margin: -10px -10px 10px -10px; /* 親要素のpaddingを考慮 */
-  padding: 5px 10px;
-  text-align: center;
-  border-bottom: 1px solid #003366;
-  border-radius: 8px 8px 0 0; /* 上部だけ角丸 */
-  box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.3); /* インナーシャドウ */
+  font-family: var(--ui);
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--title-fg);
+  background: linear-gradient(90deg, var(--title-a), var(--title-b));
+  margin: -8px -8px 8px;
+  padding: 3px 8px;
+  text-align: left;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
-.sidebar-box ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-.sidebar-box li {
-  margin-bottom: 3px;
-}
+.sidebar-box ul { list-style: none; padding: 0; margin: 0; }
+.sidebar-box li { margin: 0 0 3px; }
 
+/* メニュー項目＝Win95ボタン */
 .sidebar-box.menu ul li a {
   display: block;
-  background: linear-gradient(to bottom, #A0A0A0, #808080); /* グラデーション */
-  border: 1px solid #666666;
-  padding: 5px 10px;
+  padding: 4px 8px;
+  font-family: var(--ui);
+  font-size: 13px;
+  font-weight: normal;
+  color: var(--dk);
   text-decoration: none;
-  color: #FFFFFF;
-  font-weight: bold;
-  border-radius: 5px; /* 角丸 */
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); /* ドロップシャドウ */
-  transition: all 0.2s ease; /* ホバーエフェクト用 */
+  transform: none;
+  transition: none;
 }
-
-.sidebar-box.menu ul li a:hover {
-  background: linear-gradient(to bottom, #B0B0B0, #909090); /* ホバー時のグラデーション */
-  color: #FFFF00; /* ホバー時の色 */
-  box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.4); /* ホバー時のシャドウ */
-  transform: translateY(-1px); /* わずかに上に移動 */
-}
-
+.sidebar-box.menu ul li a:hover { color: var(--dk); text-decoration: underline; }
 .sidebar-box.menu ul li a:active {
-  background: linear-gradient(to bottom, #808080, #A0A0A0); /* クリック時のグラデーション */
-  border-color: #333333;
-  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5); /* 押し込み効果 */
-  transform: translateY(1px); /* わずかに下に移動 */
+  border-color: var(--sh) var(--hi) var(--hi) var(--sh);
+  box-shadow: inset 1px 1px 0 var(--dk), inset -1px -1px 0 var(--face-lt);
+  padding: 5px 7px 3px 9px;
 }
 
-/* --- フッター --- */
+/* =========================================================================
+   フッター＝ステータスバー
+   ========================================================================= */
+
 footer {
-  text-align: center;
-  padding: 10px;
-  margin-top: 15px;
-  border-top: 1px solid #A0A0A0;
-  font-size: 11px;
-  color: #555555;
-  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5); /* テキストシャドウ */
+  margin: 0 3px 3px;
+  padding: 3px 6px;
+  font-family: var(--ui);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--dk);
+  text-align: left;
+  text-shadow: none;
+  border: 0;
+  border-top: 1px solid var(--hi);
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+footer p { margin: 0; flex: 1 1 auto; }
+footer small { font-size: 12px; }
+/* ステータスバーの各セルを凹ませる */
+footer > p {
+  border: 2px solid;
+  border-color: var(--sh) var(--hi) var(--hi) var(--sh);
+  box-shadow: inset 1px 1px 0 var(--dk), inset -1px -1px 0 var(--face-lt);
+  padding: 2px 6px;
 }
 
-/* --- おみくじ関連のスタイル --- */
+/* =========================================================================
+   ボタン類
+   ========================================================================= */
+
+.omikuji-button,
+.example-btn,
+.work-links a,
+.book-links a,
+button,
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+  font-family: var(--ui);
+  font-size: 14px;
+  color: var(--dk);
+  background: var(--face);
+  text-decoration: none;
+  text-shadow: none;
+  cursor: pointer;
+  padding: 6px 16px;
+  transform: none;
+  transition: none;
+  display: inline-block;
+}
+
+.omikuji-button { padding: 8px 22px; }
+
+.omikuji-button:hover,
+.example-btn:hover,
+.work-links a:hover,
+.book-links a:hover,
+button:hover,
+input[type="submit"]:hover,
+input[type="reset"]:hover,
+input[type="button"]:hover { background: var(--face); color: var(--dk); transform: none; }
+
+.omikuji-button:active,
+.example-btn:active,
+.work-links a:active,
+.book-links a:active,
+button:active,
+input[type="submit"]:active,
+input[type="reset"]:active,
+input[type="button"]:active {
+  border-color: var(--sh) var(--hi) var(--hi) var(--sh);
+  box-shadow: inset 1px 1px 0 var(--dk), inset -1px -1px 0 var(--face-lt);
+  padding-top: 7px;
+  padding-bottom: 5px;
+  transform: none;
+}
+
+.work-links a, .book-links a {
+  margin: 0 6px 6px 0;
+  padding: 4px 12px;
+  font-size: 13px;
+}
+
+.omikuji-button:disabled,
+button:disabled { color: var(--sh); text-shadow: 1px 1px 0 var(--hi); cursor: default; }
+
+/* =========================================================================
+   フォーム部品
+   ========================================================================= */
+
+.form-group { margin-bottom: 12px; }
+
+.form-group label {
+  display: block;
+  font-family: var(--ui);
+  font-size: 13px;
+  font-weight: normal;
+  margin-bottom: 4px;
+  color: var(--dk);
+}
+
+select,
+input[type="text"],
+input[type="email"],
+input[type="search"],
+input[type="url"],
+input[type="number"],
+input[type="password"],
+textarea {
+  padding: 5px 6px;
+  font-family: var(--body);
+  font-size: 16px;   /* iOSの自動ズーム防止のため16px以上を維持 */
+  line-height: 1.5;
+  background: var(--well);
+  color: var(--dk);
+  max-width: 100%;
+}
+.form-group select,
+.form-group input,
+.form-group textarea { width: 100%; }
+textarea { resize: vertical; min-height: 6em; }
+select { font-family: var(--ui); }
+
+/* --- fieldset は Win95 のグループボックス --- */
+fieldset {
+  border: 1px solid var(--sh);
+  box-shadow: 1px 1px 0 var(--hi), inset 1px 1px 0 var(--hi);
+  border-radius: 0;
+  padding: 12px;
+  margin: 0 0 12px;
+}
+legend {
+  font-family: var(--ui);
+  font-size: 13px;
+  padding: 0 5px;
+}
+
+/* --- チェックボックス／ラジオは拡大してタップしやすく --- */
+input[type="checkbox"], input[type="radio"] { width: 16px; height: 16px; vertical-align: -2px; }
+
+/* =========================================================================
+   作品集・書庫・ポエム・名言・ブログ
+   ========================================================================= */
+
+.work-item, .book-item, .quote-item {
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+
+.work-title, .book-title {
+  font-family: var(--ui);
+  font-size: 15px;
+  font-weight: bold;
+  color: #000080;
+  margin-bottom: 4px;
+  text-shadow: none;
+}
+
+.work-tech, .book-author, .post-meta {
+  font-family: var(--ui);
+  font-size: 12px;
+  color: #404040;
+  margin-bottom: 6px;
+}
+
+.work-links, .book-links { margin-top: 8px; }
+
+.book-rating { margin: 4px 0; }
+.star { color: #808000; font-size: 15px; text-shadow: none; }
+
+.poem-item {
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  border-left-width: 2px;
+}
+.poem-title {
+  font-family: var(--ui);
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--dk);
+  margin-bottom: 8px;
+  text-shadow: none;
+}
+.poem-content {
+  white-space: pre-wrap;
+  font-family: 'MS Mincho', 'ＭＳ 明朝', 'Hiragino Mincho ProN', serif;
+  line-height: 1.9;
+  margin: 10px 0;
+  color: var(--dk);
+}
+.poem-date {
+  text-align: right;
+  font-family: var(--ui);
+  font-size: 12px;
+  color: #404040;
+  margin-top: 8px;
+}
+
+.quote-item { font-size: 15px; }
+
+.blog-posts { list-style: none; padding: 0; margin: 0; }
+.blog-posts li { margin-bottom: 10px; }
+
+/* =========================================================================
+   おみくじ
+   ========================================================================= */
+
 .omikuji-result {
+  padding: 12px;
+  margin: 12px 0;
+  background: var(--face);
+  border: 2px solid;
+  border-color: var(--sh) var(--hi) var(--hi) var(--sh);
+  box-shadow: inset 1px 1px 0 var(--dk), inset -1px -1px 0 var(--face-lt);
+  border-radius: 0;
   text-align: center;
-  padding: 15px;
-  background: linear-gradient(to bottom, #E0E0E0, #C0C0C0);
-  border: 1px solid #B0B0B0;
-  border-radius: 8px;
-  margin: 15px 0;
-  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);
 }
 
 .omikuji-fortune {
-  font-size: 24px; /* 少し大きく */
+  font-family: var(--ui);
+  font-size: 26px;
   font-weight: bold;
-  color: #CC0000; /* 赤色 */
+  color: #c00000;
   margin-bottom: 10px;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: none;
 }
 
-.omikuji-message {
-  font-size: 16px; /* 少し大きく */
-  margin: 10px 0;
-  color: #333333;
-}
+.omikuji-message { font-size: 15px; margin: 10px 0; color: var(--dk); }
 
 .omikuji-category {
-  background: linear-gradient(to bottom, #FFFFCC, #FFDD88);
-  border: 1px solid #FFCC00;
-  padding: 8px;
-  margin: 8px 0;
-  border-radius: 5px;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+  background: #ffffcc;
+  border: 2px solid;
+  border-color: var(--sh) var(--hi) var(--hi) var(--sh);
+  box-shadow: inset 1px 1px 0 var(--dk), inset -1px -1px 0 var(--face-lt);
+  border-radius: 0;
+  padding: 6px 8px;
+  margin: 6px 0;
+  text-align: left;
 }
 
-.omikuji-button {
-  background: linear-gradient(to bottom, #00CC00, #009900); /* 緑のグラデーション */
-  border: 1px solid #006600;
-  padding: 12px 25px; /* 少し大きく */
-  font-size: 18px; /* 少し大きく */
-  font-weight: bold;
-  cursor: pointer;
-  border-radius: 8px;
-  color: #FFFFFF;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
-  transition: all 0.2s ease;
-}
-
-.omikuji-button:hover {
-  background: linear-gradient(to bottom, #00DD00, #00AA00);
-  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
-  transform: translateY(-1px);
-}
-
-.omikuji-button:active {
-  background: linear-gradient(to bottom, #009900, #00CC00);
-  border-color: #003300;
-  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
-  transform: translateY(1px);
-}
-
-/* おみくじ結果の和紙風カード */
 .omikuji-paper {
   text-align: center;
-  padding: 20px;
-  background: linear-gradient(to bottom, #FFFEF5, #FBF3D8);
-  border: 2px solid #D8C690;
-  border-radius: 8px;
-  margin: 15px auto;
-  max-width: 360px;
-  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2), inset 0 0 12px rgba(216, 198, 144, 0.4);
+  padding: 18px;
+  margin: 12px auto;
+  max-width: 380px;
+  background: #fffef5;
 }
-
 .omikuji-jinjya {
+  font-family: var(--ui);
   font-size: 13px;
   color: #806000;
   margin-bottom: 8px;
   letter-spacing: 1px;
 }
+.omikuji-form { margin-top: 10px; }
 
-/* フォーム部品（おみくじ抽選・奉納） */
-.omikuji-form {
-  margin-top: 10px;
-}
+/* =========================================================================
+   テーブル・コード
+   ========================================================================= */
 
-.form-group {
-  margin-bottom: 12px;
-}
-
-.form-group label {
-  display: block;
-  font-weight: bold;
-  font-size: 13px;
-  margin-bottom: 4px;
-  color: #333333;
-}
-
-.form-group select,
-.form-group input[type="text"],
-.form-group textarea {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 6px 8px;
-  font-size: 14px;
-  border: 1px solid #B0B0B0;
-  border-radius: 4px;
-  background: #FFFFFF;
-}
-
-.form-group textarea {
-  resize: vertical;
-}
-
-/* --- 作品集のスタイル --- */
-.work-item {
-  border: 1px solid #B0B0B0;
-  border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 10px;
-  background: linear-gradient(to bottom, #FFFFFF, #E0E0E0);
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-.work-title {
-  font-size: 16px;
-  font-weight: bold;
-  color: #000080; /* 濃い青 */
-  margin-bottom: 5px;
-}
-
-.work-tech {
-  font-size: 11px;
-  color: #555;
-  margin-bottom: 5px;
-}
-
-.work-links {
-  margin-top: 8px;
-}
-
-.work-links a {
-  display: inline-block;
-  margin-right: 10px;
-  padding: 5px 12px; /* 少し大きく */
-  background: linear-gradient(to bottom, #66CCFF, #3399FF); /* 青のグラデーション */
-  border: 1px solid #0066CC;
-  text-decoration: none;
-  border-radius: 5px;
-  color: #FFFFFF;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-  transition: all 0.2s ease;
-}
-
-.work-links a:hover {
-  background: linear-gradient(to bottom, #3399FF, #66CCFF);
-  box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.3);
-  transform: translateY(-1px);
-}
-
-/* --- 書庫のスタイル --- */
-.book-item {
-  border: 1px solid #B0B0B0;
-  border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 10px;
-  background: linear-gradient(to bottom, #FFFFFF, #E0E0E0);
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-.book-title {
-  font-size: 16px;
-  font-weight: bold;
-  color: #000080; /* 濃い青 */
-  margin-bottom: 3px;
-}
-
-.book-author {
-  font-size: 12px;
-  color: #555;
-  margin-bottom: 5px;
-}
-
-.book-rating {
-  margin: 5px 0;
-}
-
-.star {
-  color: #FFD700; /* 金色 */
-  font-size: 16px;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.book-links {
-  margin-top: 8px;
-}
-
-.book-links a {
-  display: inline-block;
-  margin-right: 10px;
-  padding: 5px 12px; /* 少し大きく */
-  background: linear-gradient(to bottom, #66CCFF, #3399FF); /* 青のグラデーション */
-  border: 1px solid #0066CC;
-  text-decoration: none;
-  border-radius: 5px;
-  color: #FFFFFF;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-  transition: all 0.2s ease;
-}
-
-.book-links a:hover {
-  background: linear-gradient(to bottom, #3399FF, #66CCFF);
-  box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.3);
-  transform: translateY(-1px);
-}
-
-/* --- ポエムのスタイル --- */
-.poem-item {
-  background: linear-gradient(to bottom, #E0E0E0, #C0C0C0);
-  border: 1px solid #B0B0B0;
-  border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 15px;
-  border-left: 8px solid #FF6600; /* アクセントカラーをオレンジに */
-  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);
-}
-
-.poem-title {
-  font-size: 18px;
-  font-weight: bold;
-  color: #000000;
-  margin-bottom: 8px;
-  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
-}
-
-.poem-content {
-  white-space: pre-wrap;
-  font-family: 'MS Mincho', 'ＭＳ 明朝', serif;
-  line-height: 1.6;
-  margin: 10px 0;
-  color: #333333;
-}
-
-.poem-date {
-  text-align: right;
-  font-size: 12px;
-  color: #555;
-  margin-top: 8px;
-}
-
-/* --- テーブルのレスポンシブ対応 --- */
-.table-responsive {
-  overflow-x: auto;
-}
+.table-responsive { overflow-x: auto; background: var(--well); }
+/* 横スクロール枠に入っているデータ表だけ、潰れないよう最低幅を持たせる。
+   レイアウト目的の素の <table>（BBS投稿フォーム等）には効かせない。 */
+.table-responsive table { min-width: 480px; }
 
 table {
   width: 100%;
-  min-width: 500px;
   border-collapse: collapse;
-  border: 1px solid #B0B0B0;
-  border-radius: 8px; /* 角丸 */
-  overflow: hidden; /* 角丸を適用するために必要 */
-  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+  box-shadow: none;
+  background: var(--well);
+  font-size: 14px;
 }
 
-table th,
-table td {
-  border: 1px solid #C0C0C0;
-  padding: 8px;
+table th, table td {
+  border: 1px solid var(--sh);
+  padding: 5px 8px;
+  text-align: left;
 }
 
 table thead tr {
-  background: linear-gradient(to bottom, #6699CC, #336699); /* 青のグラデーション */
-  color: #FFFFFF;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  background: var(--face);
+  color: var(--dk);
+  font-family: var(--ui);
+  text-shadow: none;
+}
+table thead th {
+  border: 2px solid;
+  border-color: var(--face-lt) var(--dk) var(--dk) var(--face-lt);
+  box-shadow: inset 1px 1px 0 var(--hi), inset -1px -1px 0 var(--sh);
 }
 
-/* === レスポンシブ対応（タブレット・スマートフォン） === */
+pre, code, .language-uzume {
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.6;
+}
+pre {
+  background: var(--well);
+  color: var(--dk);
+  padding: 8px 10px;
+  margin: 0 0 0.9em;
+  overflow-x: auto;
+  border: 2px solid;
+  border-color: var(--sh) var(--hi) var(--hi) var(--sh);
+  box-shadow: inset 1px 1px 0 var(--dk), inset -1px -1px 0 var(--face-lt);
+}
+pre code { background: none; padding: 0; }
+code { background: #ffffcc; padding: 0 3px; }
 
-/* タブレット対応 (768px以下) */
-@media screen and (max-width: 768px) {
+hr {
+  border: 0;
+  border-top: 1px solid var(--sh);
+  box-shadow: 0 1px 0 var(--hi);
+  margin: 14px 0;
+}
+
+img { max-width: 100%; height: auto; }
+
+/* =========================================================================
+   タスクバー（JSが差し込む）
+   ========================================================================= */
+
+.win-taskbar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: var(--taskbar-h);
+  background: var(--face);
+  border-top: 2px solid var(--hi);
+  box-shadow: 0 1px 0 var(--face-lt) inset;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 4px;
+  z-index: 1000;
+  font-family: var(--ui);
+  font-size: 13px;
+  color: var(--dk);
+}
+
+.win-start {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  padding: 3px 9px 3px 6px;
+  font: bold 14px var(--ui);
+  color: var(--dk);
+  background: var(--face);
+  border: 2px solid;
+  border-color: var(--face-lt) var(--dk) var(--dk) var(--face-lt);
+  box-shadow: inset 1px 1px 0 var(--hi), inset -1px -1px 0 var(--sh);
+  cursor: pointer;
+  user-select: none;
+}
+.win-start[aria-expanded="true"],
+.win-start:active {
+  border-color: var(--sh) var(--hi) var(--hi) var(--sh);
+  box-shadow: inset 1px 1px 0 var(--dk), inset -1px -1px 0 var(--face-lt);
+  padding: 4px 8px 2px 7px;
+}
+.win-start .flag {
+  width: 16px; height: 14px; flex: 0 0 auto;
+  background:
+    linear-gradient(135deg, #ff0000 0 50%, transparent 0) 0 0/8px 7px no-repeat,
+    linear-gradient(135deg, #00a000 0 50%, transparent 0) 8px 0/8px 7px no-repeat,
+    linear-gradient(135deg, #0000c0 0 50%, transparent 0) 0 7px/8px 7px no-repeat,
+    linear-gradient(135deg, #ffc000 0 50%, transparent 0) 8px 7px/8px 7px no-repeat;
+}
+
+.win-taskbar .sep {
+  flex: 0 0 auto;
+  width: 2px;
+  height: 22px;
+  border-left: 1px solid var(--sh);
+  border-right: 1px solid var(--hi);
+}
+
+/* タスクバー上の「開いているウィンドウ」ボタン */
+.win-task {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 240px;
+  padding: 4px 10px 2px;
+  font: bold 13px var(--ui);
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: var(--face);
+  color: var(--dk);
+  border: 2px solid;
+  border-color: var(--sh) var(--hi) var(--hi) var(--sh);
+  box-shadow: inset 1px 1px 0 var(--dk), inset -1px -1px 0 var(--face-lt);
+  background-image: repeating-conic-gradient(rgba(255,255,255,.55) 0 25%, transparent 0 50%);
+  background-size: 2px 2px;
+}
+
+.win-clock {
+  margin-left: auto;
+  flex: 0 0 auto;
+  padding: 3px 8px;
+  font: 13px var(--ui);
+  color: var(--dk);
+  background: var(--face);
+  border: 2px solid;
+  border-color: var(--sh) var(--hi) var(--hi) var(--sh);
+  box-shadow: inset 1px 1px 0 var(--dk), inset -1px -1px 0 var(--face-lt);
+  white-space: nowrap;
+}
+
+/* =========================================================================
+   スタートメニュー（JSが差し込む）
+   ========================================================================= */
+
+.win-startmenu {
+  position: fixed;
+  left: 4px;
+  bottom: var(--taskbar-h);
+  z-index: 1001;
+  display: none;
+  min-width: 260px;
+  max-width: calc(100vw - 8px);
+  max-height: calc(100vh - var(--taskbar-h) - 12px);
+  background: var(--face);
+  border: 2px solid;
+  border-color: var(--face-lt) var(--dk) var(--dk) var(--face-lt);
+  box-shadow: inset 1px 1px 0 var(--hi), inset -1px -1px 0 var(--sh);
+}
+.win-startmenu[data-open="1"] { display: flex; }
+
+/* 左端の縦帯 */
+.win-startmenu .banner {
+  flex: 0 0 26px;
+  background: linear-gradient(0deg, var(--title-b), var(--title-a));
+  color: var(--title-fg);
+  font: bold 15px var(--ui);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  text-align: left;
+  padding: 8px 4px;
+  letter-spacing: 1px;
+  user-select: none;
+}
+
+.win-startmenu ul {
+  flex: 1 1 auto;
+  color: var(--dk);
+  list-style: none;
+  margin: 0;
+  padding: 3px;
+  overflow-y: auto;
+  min-width: 0;
+}
+.win-startmenu li { margin: 0; }
+.win-startmenu li.divider {
+  height: 2px;
+  margin: 3px 2px;
+  border-top: 1px solid var(--sh);
+  border-bottom: 1px solid var(--hi);
+}
+.win-startmenu a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px 7px 8px;
+  font: 15px var(--ui);
+  color: var(--dk);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.win-startmenu a .ico { flex: 0 0 auto; font-size: 15px; width: 1.2em; text-align: center; }
+.win-startmenu a:hover,
+.win-startmenu a:focus { background: var(--sel-bg); color: var(--sel-fg); outline: none; }
+.win-startmenu a[aria-current="page"] { font-weight: bold; }
+
+/* =========================================================================
+   レスポンシブ
+   スマホでは「メニュー15行を越えないと本文に着かない」問題を解消する。
+   ・サイドバーのメニューは非表示にし、タスクバーのスタートメニューへ集約
+   ・残りのサイドバー部品は本文の下（order:3）へ
+   ・文字は縮めない。縮めるのは枠だけ。
+   ========================================================================= */
+
+@media screen and (max-width: 900px) {
+  body { padding: 0 0 calc(var(--taskbar-h) + 8px); }
+
   .container {
-    margin: 10px;
-    padding: 10px;
+    max-width: none;
+    border-width: 0 0 2px;
+    border-color: var(--dk);
+    box-shadow: none;
   }
-  
-  header h1 {
-    font-size: 20px;
-  }
-  
-  header p {
-    font-size: 10px;
-  }
-  
+
+  .container > header { margin: 0; padding: 5px 5px 5px 8px; }
+  .container > header h1 { font-size: 15px; }
+  .win-menubar { margin: 0; }
+  .info-bar { margin: 6px 6px 0; font-size: 13px; }
+
   .main-wrapper {
     flex-direction: column;
-    gap: 10px;
+    margin: 6px;
+    gap: 8px;
   }
-  
-  .sidebar {
-    order: 1;
-  }
-  
-  main {
-    order: 2;
-  }
-  
-  .box {
-    padding: 10px;
-  }
-  
-  .box h2 {
-    font-size: 16px;
-    margin: -10px -10px 10px -10px;
-    padding: 4px 8px;
-  }
-  
-  .sidebar-box {
-    padding: 8px;
-  }
-  
-  .info-bar {
-    font-size: 10px;
-  }
+
+  /* 本文を先に、サイドバーの残りを後に */
+  main { order: 1; width: 100%; flex: 1 1 auto; }
+  .sidebar { order: 3; width: 100%; flex: 1 1 auto; }
+
+  /* メニューはスタートメニューが担当する */
+  .sidebar-box.menu { display: none; }
+
+  footer { margin: 0; }
+  footer > p { flex: 1 1 100%; }
+
+  .win-startmenu { min-width: 0; width: calc(100vw - 8px); }
+  .win-task { display: none; }
+
+  /* size="50" / cols="50" などの古い属性が画面幅を押し広げるのを防ぐ */
+  input[type="text"],
+  input[type="email"],
+  input[type="search"],
+  input[type="url"],
+  input[type="password"],
+  textarea,
+  select { width: 100%; }
+  table, table td, table th { max-width: 100%; }
 }
 
-/* スマートフォン対応 (480px以下) */
-@media screen and (max-width: 480px) {
-  .container {
-    margin: 5px;
-    padding: 8px;
-  }
-  
-  header {
-    padding: 8px;
-  }
-  
-  header h1 {
-    font-size: 18px;
-  }
-  
-  header p {
-    font-size: 9px;
-  }
-  
-  .box {
-    padding: 8px;
-  }
-  
-  .box h2 {
-    font-size: 14px;
-    margin: -8px -8px 8px -8px;
-    padding: 3px 6px;
-  }
-  
-  .sidebar-box {
-    padding: 6px;
-  }
-  
-  .sidebar-box h3 {
-    font-size: 12px;
-  }
-  
-  footer {
-    padding: 8px;
-    font-size: 10px;
-  }
-  
-  /* フォーム要素の調整 */
-  input[type="text"], 
-  input[type="email"], 
-  textarea {
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-  
-  /* ボタンの調整 */
-  .omikuji-button {
-    width: 100%;
-    padding: 8px;
-    font-size: 14px;
-  }
-  
-  /* 作品集・書庫のリンクを縦並びに */
-  .work-links a,
-  .book-links a {
-    display: block;
-    margin: 3px 0;
-    text-align: center;
-  }
-  
-  /* マーキーの調整 */
-  .info-bar {
-    font-size: 9px;
-    padding: 2px 0;
-  }
+@media screen and (max-width: 420px) {
+  body { line-height: 1.75; }
+  .container > header h1 { font-size: 13px; }
+  .container > header p { font-size: 11px; }
+  .win-menubar { font-size: 12px; }
+  .win-menubar span { padding: 2px 5px; }
+  .box { padding: 8px 9px 10px; }
+  .box h2 { margin: -8px -9px 10px; font-size: 13px; }
+  .sidebar-box { padding: 7px; }
+  .sidebar-box h3 { margin: -7px -7px 7px; }
+  .info-bar { font-size: 12px; }
+  .omikuji-button, .example-btn { width: 100%; text-align: center; }
+  .work-links a, .book-links a { display: block; margin: 0 0 5px; text-align: center; }
+  .win-clock { padding: 3px 5px; font-size: 12px; }
+  .win-start { font-size: 13px; }
 }
 
-/* 極小画面対応 (320px以下) */
-@media screen and (max-width: 320px) {
-  body {
-    font-size: 12px;
-  }
-  
-  .container {
-    margin: 1px;
-    padding: 5px;
-  }
-  
-  header h1 {
-    font-size: 16px;
-  }
-  
-  .box {
-    padding: 5px;
-  }
-  
-  .box h2 {
-    font-size: 12px;
-    margin: -5px -5px 5px -5px;
-    padding: 2px 4px;
-  }
+/* --- 印刷時はデスクトップの装飾を落とす --- */
+@media print {
+  body { background: #fff; padding: 0; }
+  .win-taskbar, .win-startmenu, .info-bar, .win-menubar, .win-controls { display: none !important; }
+  .container { border: 0; box-shadow: none; background: #fff; }
 }
