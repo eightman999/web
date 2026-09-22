@@ -193,6 +193,7 @@
 </head>
 <body>
 
+  <a class="skip-link" href="#main">本文へスキップ</a>
   <div class="container">
     <header>
       <h1>†‡ DevDocs ‡†</h1>
@@ -200,7 +201,7 @@
     </header>
 
     <marquee class="info-bar" bgcolor="#ffffcc" scrolldelay="80">
-      【メモ】よく開く公式ドキュメントへのショートカット集です。リンク切れを見つけたらBBSで教えてください！
+      【メモ】よく開く公式ドキュメントへのショートカット集です。リンク切れを見つけたらLINKページのお問い合わせから教えてください！
     </marquee>
 
     <div class="main-wrapper">
@@ -210,13 +211,12 @@
           <ul>
             <li><a href="index.html">トップ</a></li>
             <li><a href="blog.html">ブログ</a></li>
-            <li><a href="quotes.html">好きな言葉</a></li>
-            <li><a href="omikuji.html">今日のおみくじ</a></li>
             <li><a href="works.html">作品集</a></li>
             <li><a href="docs.html">DevDocs</a></li>
+            <li><a href="uzume_player.html">Uzume Player</a></li>
+            <li><a href="quotes.html">好きな言葉</a></li>
+            <li><a href="omikuji.html">今日のおみくじ</a></li>
             <li><a href="library.html">書庫</a></li>
-            <li><a href="poem.html">ポエム</a></li>
-            <li><a href="bbs.html">BBS</a></li>
             <li><a href="link.html">LINK</a></li>
             <li><a href="news.html">更新履歴</a></li>
             <li><a href="sitemap.html">サイトマップ</a></li>
@@ -224,7 +224,7 @@
         </div>
       </aside>
 
-      <main>
+      <main id="main">
         <div class="docwin">
           <div class="docwin-titlebar">
             <span class="docwin-title"><span class="ico">📚</span>DevDocs.exe — eightman999 が使っている技術ドキュメント</span>
@@ -256,9 +256,7 @@
           </div>
         </div>
 
-        <div style="text-align: center; margin-top: 20px;">
-          <a href="index.html">トップページに戻る</a>
-        </div>
+        <p class="back-link"><a href="index.html">&laquo; トップページに戻る</a></p>
       </main>
     </div>
 
@@ -492,5 +490,6 @@
   })();
   </script>
 
+  <script src="script.js" defer></script>
 </body>
 </html>
