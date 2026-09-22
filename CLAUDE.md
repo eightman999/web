@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a personal website project featuring:
 - A retro 90s/2000s Japanese web aesthetic with HTML4/CSS styling
 - Multiple UI templates (Windows 7, Windows ME, Windows XP, Windows Vista, Google, Amazon, Yahoo, Bing styles)
-- Interactive features including BBS, blog, omikuji (fortune telling), and poetry sections
+- Interactive features including blog, omikuji (fortune telling), and DevDocs sections
 - A custom music programming language compiler called "Uzume" written in JavaScript
 
 ## Architecture
@@ -20,7 +20,7 @@ This is a personal website project featuring:
 ### Core Features
 - **Template System**: Directory `template/` contains various OS/brand-themed UI templates
 - **Uzume Compiler**: `uzume.js` contains a complete music programming language compiler that generates audio using Web Audio API
-- **Interactive Pages**: Various HTML pages for different sections (blog, BBS, poetry, library, etc.)
+- **Interactive Pages**: Various HTML pages for different sections (blog, library, quotes, etc.)
 
 ### Template Structure
 Each template in `template/` follows the same pattern:

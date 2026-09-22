@@ -114,6 +114,16 @@ header p {
 main {
   flex: 3;
   order: 2;
+  min-width: 0; /* 長いURL等で横にはみ出さないように */
+}
+
+/* サイドバー：PCでは追従表示（画面に十分な高さがある場合のみ） */
+@media screen and (min-width: 769px) and (min-height: 820px) {
+  .sidebar {
+    position: sticky;
+    top: 10px;
+    align-self: flex-start;
+  }
 }
 
 /* --- 各コンテンツのボックス --- */
@@ -124,6 +134,7 @@ main {
   border: 1px solid #B0B0B0;
   border-radius: 8px; /* 角丸 */
   box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2); /* ドロップシャドウ */
+  overflow-wrap: anywhere; /* 長い英単語・URLを折り返す */
 }
 
 .box h2 {
@@ -202,6 +213,85 @@ main {
   border-color: #333333;
   box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5); /* 押し込み効果 */
   transform: translateY(1px); /* わずかに下に移動 */
+}
+
+/* 現在表示中のページ（script.jsが付与） */
+.sidebar-box.menu ul li a.current,
+.sidebar-box.menu ul li a[aria-current="page"] {
+  background: linear-gradient(to bottom, #3399FF, #0066CC);
+  border-color: #003366;
+  color: #FFFFFF;
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.4);
+}
+.sidebar-box.menu ul li a.current::before,
+.sidebar-box.menu ul li a[aria-current="page"]::before {
+  content: "▶ ";
+  font-size: 10px;
+}
+
+/* --- ページ内ツール・戻りリンク --- */
+.page-tools {
+  text-align: right;
+  margin: 10px 0;
+  font-size: 13px;
+}
+
+.back-link {
+  text-align: center;
+  margin: 20px 0 5px;
+}
+.back-link a {
+  display: inline-block;
+  padding: 6px 18px;
+  background: linear-gradient(to bottom, #F8F8F8, #D8D8D8);
+  border: 1px solid #909090;
+  border-radius: 5px;
+  color: #000080;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 13px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+.back-link a:hover {
+  background: linear-gradient(to bottom, #FFFFFF, #E8E8E8);
+  color: #FF0000;
+}
+.back-link a:active {
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* --- ブログ記事のメタ情報 --- */
+.post-meta {
+  font-size: 12px;
+  color: #555555;
+  margin: -5px 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed #B0B0B0;
+}
+
+/* --- アクセシビリティ：スキップリンクとフォーカス表示 --- */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: #FFFFCC;
+  color: #000000;
+  padding: 6px 12px;
+  border: 2px solid #FFCC00;
+  z-index: 1000;
+}
+.skip-link:focus {
+  left: 10px;
+  top: 10px;
+}
+
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #FF6600;
+  outline-offset: 2px;
 }
 
 /* --- フッター --- */
@@ -293,6 +383,14 @@ footer {
   color: #806000;
   margin-bottom: 8px;
   letter-spacing: 1px;
+}
+
+.omikuji-extra {
+  font-size: 12px;
+  color: #806000;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed #D8C690;
 }
 
 /* フォーム部品（おみくじ抽選・奉納） */
@@ -536,6 +634,24 @@ table thead tr {
   .sidebar-box {
     padding: 8px;
   }
+
+  /* メニューを2列のコンパクトなボタンにして、本文が下に押し出されるのを防ぐ */
+  .sidebar-box.menu ul {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+  }
+  .sidebar-box.menu ul li {
+    margin: 0;
+  }
+  .sidebar-box.menu ul li a {
+    padding: 6px 8px;
+    font-size: 12px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   
   .info-bar {
     font-size: 10px;
@@ -638,5 +754,26 @@ table thead tr {
     font-size: 12px;
     margin: -5px -5px 5px -5px;
     padding: 2px 4px;
+  }
+}
+
+/* === アニメーションを減らす設定のユーザー向け === */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-box.menu ul li a,
+  .omikuji-button,
+  .work-links a,
+  .book-links a {
+    transition: none;
+  }
+  .sidebar-box.menu ul li a:hover,
+  .omikuji-button:hover,
+  .work-links a:hover,
+  .book-links a:hover {
+    transform: none;
   }
 }

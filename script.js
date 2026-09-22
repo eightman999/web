@@ -55,6 +55,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    /**
+     * サイドバーのメニューのうち、いま表示しているページへのリンクに
+     * 「現在地」の印（class="current" と aria-current）を付けます。
+     */
+    function markCurrentMenuItem() {
+        const links = document.querySelectorAll('.sidebar-box.menu a[href]');
+        if (links.length === 0) {
+            return;
+        }
+        // "/", "/index.html" などを "index.html" のようなファイル名に揃えます
+        let current = location.pathname.split('/').pop();
+        if (current === '') {
+            current = 'index.html';
+        }
+        links.forEach((link) => {
+            const href = link.getAttribute('href');
+            // ページ内リンク（#about など）と外部リンクは対象外です
+            if (!href || href.startsWith('#') || href.startsWith('http')) {
+                return;
+            }
+            const target = href.split('#')[0].split('?')[0];
+            if (target === current) {
+                link.classList.add('current');
+                link.setAttribute('aria-current', 'page');
+            }
+        });
+    }
+
     // 上で定義した関数を実行します
     setDailyQuote();
+    markCurrentMenuItem();
 });

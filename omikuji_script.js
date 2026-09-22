@@ -66,8 +66,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('神社リストの取得に失敗しました。');
             }
             const data = await response.json();
-            if (data.success && Array.isArray(data.jinjya)) {
-                jinjyaList = data.jinjya; // 取得したリストをキャッシュ
+            // APIは神社の配列をそのまま返す。旧形式 {success, jinjya:[...]} にも対応
+            const list = Array.isArray(data) ? data : (data && Array.isArray(data.jinjya) ? data.jinjya : null);
+            if (list) {
+                jinjyaList = list; // 取得したリストをキャッシュ
 
                 // ドロップダウンの選択肢をクリア
                 drawJinjyaSelect.innerHTML = '<option value="">すべての神社から</option>';
@@ -111,19 +113,43 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('omikujiResult', JSON.stringify(dataToStore));
     }
 
+    /**
+     * エラー応答の本文からメッセージを取り出す。
+     * APIはJSON({error}) のほか、プレーンテキスト（例:「まだ誰も奉納していません🙏」）を返すことがある
+     */
+    async function readErrorMessage(response) {
+        const fallback = `サーバーエラー (${response.status})`;
+        try {
+            const text = (await response.text()).trim();
+            if (!text) return fallback;
+            try {
+                const json = JSON.parse(text);
+                return json.error || json.message || fallback;
+            } catch (e) {
+                return text.length <= 120 ? text : fallback;
+            }
+        } catch (e) {
+            return fallback;
+        }
+    }
+
     async function drawOmikuji() {
         omikujiButton.disabled = true;
         omikujiStatus.textContent = '運勢を占っています...';
         omikujiStatus.style.color = '#333';
 
-        const selectedJinjyaId = drawJinjyaSelect.value;
-        const requestUrl = selectedJinjyaId ? `${DRAW_API_URL}?jinjya=${selectedJinjyaId}` : DRAW_API_URL;
+        // 「すべての神社から」の場合は、取得済みの神社リストからランダムに1社選んで引く
+        // （APIの jinjya 未指定は神社横断抽選に対応済みだが、旧デプロイでも動くようにしておく）
+        let selectedJinjyaId = drawJinjyaSelect.value;
+        if (!selectedJinjyaId && jinjyaList.length > 0) {
+            selectedJinjyaId = jinjyaList[Math.floor(Math.random() * jinjyaList.length)].id;
+        }
+        const requestUrl = selectedJinjyaId ? `${DRAW_API_URL}?jinjya=${encodeURIComponent(selectedJinjyaId)}` : DRAW_API_URL;
 
         try {
             const response = await fetch(requestUrl);
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ error: `サーバーエラー (${response.status})` }));
-                throw new Error(errorData.error || `サーバーエラー (${response.status})`);
+                throw new Error(await readErrorMessage(response));
             }
             const result = await response.json();
             
@@ -161,6 +187,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 categoryDiv.innerHTML = `<strong>${key}:</strong> <span>${tags[key]}</span>`;
                 tagsContainer.appendChild(categoryDiv);
             }
+        }
+        // ラッキーアイテムなどの追加情報（extra）があれば表示
+        const extra = data.extra || {};
+        const extraKeys = Object.keys(extra);
+        if (extraKeys.length > 0) {
+            const extraDiv = document.createElement('div');
+            extraDiv.className = 'omikuji-extra';
+            extraDiv.textContent = extraKeys.map(key => `${key}: ${extra[key]}`).join(' ／ ');
+            tagsContainer.appendChild(extraDiv);
         }
         omikujiResult.style.display = 'block';
     }
@@ -239,16 +274,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(payload),
             });
 
-            const responseData = await response.json();
-
-            if (response.ok) {
-                submitStatus.textContent = responseData.message || '奉納を受け付けました🙏';
-                submitStatus.style.color = 'green';
-                submitForm.reset();
-                handleJinjyaSelectionChange(); // フォームを初期状態に戻す
-            } else {
-                throw new Error(responseData.error || `奉納に失敗しました (${response.status})`);
+            if (!response.ok) {
+                throw new Error(await readErrorMessage(response));
             }
+            const responseData = await response.json().catch(() => ({}));
+            submitStatus.textContent = responseData.message || '奉納を受け付けました🙏';
+            submitStatus.style.color = 'green';
+            submitForm.reset();
+            handleJinjyaSelectionChange(); // フォームを初期状態に戻す
         } catch (error) {
             console.error('奉納中にエラーが発生:', error);
             submitStatus.textContent = `エラー: ${error.message}`;
