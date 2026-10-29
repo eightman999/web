@@ -1,0 +1,974 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="ja">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="地元のモンスター P100 vs V100 - 研究室のGPUたちが縄張りを賭けて戦うターン制バトルゲーム。">
+  <title>地元のモンスター P100 vs V100</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=DotGothic16&display=swap">
+  <style>
+    :root {
+      --p-accent: #76d82a;
+      --p-glow: #8cff3a;
+      --v-accent: #e3c47a;
+      --v-glow: #ffd766;
+      --bg: #060806;
+      --ink: #f4f4ee;
+      --dim: #9aa39a;
+      --win: #121612;
+      --win-border: #e9e9e0;
+      --danger: #ff4d3d;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "DotGothic16", "MS Gothic", monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    button { font-family: inherit; }
+
+    /* ===== background: split green / gold ===== */
+    .stage-bg {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(255,255,255,.18) 0, rgba(255,255,255,0) 6%),
+        linear-gradient(115deg, rgba(118,216,42,.28) 0%, rgba(118,216,42,0) 38%),
+        linear-gradient(245deg, rgba(227,196,122,.28) 0%, rgba(227,196,122,0) 38%),
+        radial-gradient(ellipse at 0% 50%, rgba(80,160,20,.35), transparent 55%),
+        radial-gradient(ellipse at 100% 50%, rgba(170,140,60,.35), transparent 55%),
+        #060806;
+    }
+    .stage-bg::before, .stage-bg::after {
+      content: ""; position: absolute; top: 0; bottom: 0; width: 50%;
+      background-image: radial-gradient(rgba(255,255,255,.09) 1.2px, transparent 1.6px);
+      background-size: 9px 9px;
+      -webkit-mask-image: linear-gradient(90deg, #000, transparent 70%);
+      mask-image: linear-gradient(90deg, #000, transparent 70%);
+    }
+    .stage-bg::before { left: 0; }
+    .stage-bg::after { right: 0; transform: scaleX(-1); }
+    .streak {
+      position: fixed; z-index: 0; pointer-events: none; height: 3px; width: 60vw;
+      top: 50%; left: 50%; transform-origin: 0 50%; opacity: .55;
+    }
+
+    .app { position: relative; z-index: 1; max-width: 980px; margin: 0 auto; padding: 12px 16px 32px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--dim); gap: 8px; }
+    .topbar a { color: var(--dim); }
+    .topbar button {
+      background: transparent; color: var(--dim); border: 1px solid #444; border-radius: 3px;
+      padding: 3px 8px; cursor: pointer; font-size: 12px;
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ===== title ===== */
+    .title-wrap { text-align: center; padding-top: 6px; }
+    .title-fighters { display: flex; justify-content: center; align-items: center; gap: 0; margin: 0 auto; max-width: 820px; }
+    .title-fighters .mon { width: 44%; max-width: 340px; }
+    .vs-x {
+      font-family: "Dela Gothic One", sans-serif; font-size: 44px; color: #fff;
+      text-shadow: 0 0 12px var(--p-glow), 0 0 24px var(--v-glow);
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+    .logo {
+      font-family: "Dela Gothic One", sans-serif;
+      font-size: clamp(38px, 9vw, 86px);
+      line-height: 1; margin: -10px 0 0; letter-spacing: .02em;
+      color: #f1f1ec;
+      transform: skewX(-8deg);
+      text-shadow: 3px 3px 0 #000, -2px -2px 0 #000, 0 0 18px rgba(255,255,255,.25);
+    }
+    .logo-sub { display: flex; justify-content: center; gap: 6vw; margin-top: 4px; }
+    .logo-sub span {
+      font-family: "Dela Gothic One", sans-serif; font-size: clamp(30px, 7vw, 60px);
+      transform: skewX(-10deg); display: inline-block;
+      text-shadow: 3px 3px 0 #000;
+    }
+    .logo-sub .p { color: var(--p-accent); }
+    .logo-sub .v { color: var(--v-accent); }
+    .tagline { color: var(--dim); margin: 14px 0 20px; font-size: 15px; }
+
+    .menu-btns { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .big-btn {
+      width: min(320px, 100%); padding: 12px 16px; font-size: 18px; cursor: pointer;
+      background: #0d110d; color: var(--ink);
+      border: 2px solid var(--win-border); border-radius: 4px;
+      box-shadow: 4px 4px 0 #000;
+      transition: transform .08s, background .15s;
+    }
+    .big-btn:hover, .big-btn:focus-visible { background: #1b231b; transform: translate(-1px,-1px); outline: none; }
+    .big-btn:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 #000; }
+    .big-btn.sub { font-size: 15px; padding: 8px 14px; border-color: #666; }
+    .record { margin-top: 16px; font-size: 13px; color: var(--dim); }
+
+    .howto {
+      max-width: 620px; margin: 18px auto 0; text-align: left; font-size: 14px; line-height: 1.7;
+      background: rgba(10,14,10,.85); border: 2px solid #555; padding: 10px 16px; border-radius: 4px;
+    }
+    .howto h3 { margin: 0 0 4px; font-size: 15px; }
+    .howto ul { margin: 0; padding-left: 20px; }
+
+    /* ===== select ===== */
+    .select-head { text-align: center; font-family: "Dela Gothic One", sans-serif; font-size: 28px; margin: 10px 0 4px; }
+    .select-note { text-align: center; color: var(--dim); margin: 0 0 14px; }
+    .cards { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .card {
+      flex: 1 1 280px; max-width: 420px; cursor: pointer; text-align: left;
+      background: rgba(12,16,12,.9); color: var(--ink);
+      border: 3px solid #333; border-radius: 6px; padding: 10px 14px 14px;
+      transition: transform .12s, border-color .12s, box-shadow .12s;
+    }
+    .card:hover, .card:focus-visible { transform: translateY(-3px); outline: none; }
+    .card.p:hover, .card.p:focus-visible { border-color: var(--p-accent); box-shadow: 0 0 22px rgba(118,216,42,.45); }
+    .card.v:hover, .card.v:focus-visible { border-color: var(--v-accent); box-shadow: 0 0 22px rgba(227,196,122,.45); }
+    .card .mon { width: 70%; margin: 0 auto; display: block; }
+    .card h3 { font-family: "Dela Gothic One", sans-serif; font-size: 30px; margin: 0; }
+    .card.p h3 { color: var(--p-accent); }
+    .card.v h3 { color: var(--v-accent); }
+    .card .arch { color: var(--dim); font-size: 13px; }
+    .card p { margin: 6px 0; font-size: 14px; line-height: 1.6; }
+    .spec { font-size: 13px; display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin-top: 6px; }
+    .spec dt { color: var(--dim); }
+    .spec dd { margin: 0; }
+    .back-row { text-align: center; margin-top: 16px; }
+
+    /* ===== battle ===== */
+    .hud { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .panel {
+      background: rgba(10,13,10,.88); border: 2px solid var(--win-border); border-radius: 4px;
+      padding: 6px 10px 8px; box-shadow: 3px 3px 0 #000; font-size: 13px;
+    }
+    .panel.turn { box-shadow: 0 0 0 2px #fff, 0 0 18px var(--glow); }
+    .panel .name-row { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; }
+    .panel .nm { font-family: "Dela Gothic One", sans-serif; font-size: 20px; }
+    .panel .who { color: var(--dim); font-size: 12px; }
+    .bar-row { display: grid; grid-template-columns: 40px 1fr 70px; align-items: center; gap: 6px; margin-top: 3px; }
+    .bar-row .lbl { color: var(--dim); font-size: 12px; }
+    .bar-row .val { text-align: right; font-size: 12px; white-space: nowrap; }
+    .bar { height: 10px; background: #262b26; border: 1px solid #555; position: relative; overflow: hidden; }
+    .bar i { position: absolute; left: 0; top: 0; bottom: 0; transition: width .45s ease, background .3s; }
+    .bar .limit { position: absolute; top: -1px; bottom: -1px; width: 2px; background: #fff; opacity: .7; }
+    .hp i { background: linear-gradient(#7af07a, #2fa82f); }
+    .hp.mid i { background: linear-gradient(#ffe066, #d4a200); }
+    .hp.low i { background: linear-gradient(#ff7a6a, #c42516); }
+    .vram i { background: linear-gradient(#7fc8ff, #2b76c4); }
+    .heat i { background: linear-gradient(90deg, #3fa0ff, #ffcf3f 60%, #ff3b2a); }
+    .tags { min-height: 18px; margin-top: 3px; display: flex; gap: 4px; flex-wrap: wrap; }
+    .tag { font-size: 11px; padding: 0 5px; border-radius: 2px; background: #333; }
+    .tag.hot { background: var(--danger); color: #fff; animation: blink 0.8s steps(2) infinite; }
+    .tag.guard { background: #2b76c4; color: #fff; }
+    .tag.oom { background: #7a2bc4; color: #fff; }
+
+    .arena {
+      position: relative; height: clamp(200px, 38vw, 330px); margin: 10px 0;
+      border-bottom: 2px solid rgba(255,255,255,.12);
+      overflow: hidden;
+    }
+    .arena .floor {
+      position: absolute; left: 0; right: 0; bottom: 0; height: 32%;
+      background: repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 1px, transparent 1px 48px),
+                  linear-gradient(transparent, rgba(0,0,0,.6));
+    }
+    .arena .place { position: absolute; top: 6px; left: 0; right: 0; text-align: center; font-size: 12px; color: var(--dim); }
+    .fighter { position: absolute; bottom: 4%; width: 40%; max-width: 330px; transition: filter .3s; }
+    .fighter.left { left: 3%; }
+    .fighter.right { right: 3%; }
+    .fighter .bob { animation: bob 2.2s ease-in-out infinite; }
+    .fighter.right .bob { animation-delay: -1.1s; }
+    .fighter.hot { filter: drop-shadow(0 0 10px rgba(255,60,30,.85)) saturate(1.3); }
+    .fighter.hot .bob { animation: bob 2.2s ease-in-out infinite, jitter .12s linear infinite; }
+    .fighter.ko .bob { animation: none; transform: rotate(-80deg) translateY(30%); opacity: .45; transition: transform .6s, opacity .6s; }
+    .fighter.right.ko .bob { transform: rotate(80deg) translateY(30%); }
+    .fighter.lunge.left { animation: lungeR .35s ease-out; }
+    .fighter.lunge.right { animation: lungeL .35s ease-out; }
+    .fighter.shake { animation: shake .4s linear; }
+    .fighter.heal { filter: drop-shadow(0 0 16px #7cffb0); }
+    .fighter.guarding { filter: drop-shadow(0 0 12px #5ab0ff); }
+
+    .mon svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .mon .eye { transform-box: fill-box; transform-origin: center; animation: blinkEye 4s infinite; }
+    .mon .eye-x { display: none; }
+    .mon.hurt .eye { display: none; }
+    .mon.hurt .eye-x { display: inline; }
+    .mon .steam { display: none; }
+    .fighter.hot .mon .steam { display: inline; }
+    .steam path { animation: steam 1.2s ease-out infinite; }
+    .steam path:nth-child(2) { animation-delay: .4s; }
+    .steam path:nth-child(3) { animation-delay: .8s; }
+
+    .popup {
+      position: absolute; font-family: "Dela Gothic One", sans-serif; font-size: 30px; pointer-events: none;
+      text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+      animation: popup 1s ease-out forwards; white-space: nowrap; z-index: 5;
+    }
+    .popup.small { font-size: 18px; }
+    .beam {
+      position: absolute; top: 48%; height: 14px; left: 25%; right: 25%; z-index: 4; border-radius: 7px;
+      animation: beam .35s ease-out forwards; pointer-events: none;
+    }
+    .flash { position: absolute; inset: 0; z-index: 6; pointer-events: none; animation: flash .5s ease-out forwards; }
+
+    .msg {
+      background: rgba(8,10,8,.94); border: 3px double var(--win-border); border-radius: 4px;
+      min-height: 76px; padding: 8px 12px; font-size: 16px; line-height: 1.6; box-shadow: 3px 3px 0 #000;
+    }
+    .msg .line { display: block; }
+    .msg .line.old { color: #777; font-size: 13px; }
+    .cmds { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; margin-top: 10px; }
+    .cmd {
+      text-align: left; background: #0e130e; color: var(--ink); border: 2px solid #777; border-radius: 4px;
+      padding: 6px 10px; cursor: pointer; box-shadow: 3px 3px 0 #000; min-height: 64px;
+    }
+    .cmd:hover:not(:disabled), .cmd:focus-visible { border-color: var(--acc); background: #172017; outline: none; }
+    .cmd:disabled { opacity: .38; cursor: not-allowed; }
+    .cmd .k { color: var(--dim); font-size: 11px; margin-right: 4px; }
+    .cmd .t { font-size: 16px; }
+    .cmd .c { font-size: 11px; color: var(--dim); margin-top: 2px; }
+    .cmd .d { font-size: 12px; color: #c9cfc9; margin-top: 2px; line-height: 1.35; }
+    .waiting { text-align: center; color: var(--dim); padding: 18px 0; font-size: 14px; }
+
+    /* ===== result overlay ===== */
+    .overlay {
+      position: fixed; inset: 0; z-index: 20; background: rgba(0,0,0,.72);
+      display: none; align-items: center; justify-content: center; padding: 16px;
+    }
+    .overlay.show { display: flex; }
+    .result {
+      text-align: center; background: rgba(10,13,10,.96); border: 3px solid var(--win-border);
+      padding: 18px 20px; border-radius: 6px; width: min(460px, 100%);
+      box-shadow: 0 0 40px var(--glow, #fff);
+    }
+    .result .ko { font-family: "Dela Gothic One", sans-serif; font-size: 56px; margin: 0; color: #fff; text-shadow: 3px 3px 0 #b00; }
+    .result .wn { font-family: "Dela Gothic One", sans-serif; font-size: 28px; margin: 6px 0; }
+    .result .mon { width: 55%; margin: 0 auto; }
+    .result p { color: var(--dim); margin: 6px 0 14px; }
+    .result .menu-btns { gap: 8px; }
+
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    @keyframes jitter { 0% { translate: 0 0; } 50% { translate: 1px -1px; } 100% { translate: -1px 0; } }
+    @keyframes lungeR { 40% { transform: translateX(18%) rotate(6deg); } 100% { transform: none; } }
+    @keyframes lungeL { 40% { transform: translateX(-18%) rotate(-6deg); } 100% { transform: none; } }
+    @keyframes shake { 0%,100% { transform: none; } 20% { transform: translateX(-6%); } 40% { transform: translateX(5%); } 60% { transform: translateX(-4%); } 80% { transform: translateX(2%); } }
+    @keyframes popup { 0% { transform: translate(-50%, 0) scale(.6); opacity: 0; } 15% { transform: translate(-50%, -10px) scale(1.15); opacity: 1; } 100% { transform: translate(-50%, -60px) scale(1); opacity: 0; } }
+    @keyframes beam { 0% { transform: scaleX(0); opacity: 1; } 60% { transform: scaleX(1); opacity: 1; } 100% { transform: scaleX(1); opacity: 0; } }
+    @keyframes flash { 0% { opacity: .85; } 100% { opacity: 0; } }
+    @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+    @keyframes blink { 50% { opacity: .35; } }
+    @keyframes blinkEye { 0%, 94%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
+    @keyframes steam { 0% { opacity: 0; transform: translateY(0); } 30% { opacity: .8; } 100% { opacity: 0; transform: translateY(-30px); } }
+
+    @media (max-width: 600px) {
+      .hud { grid-template-columns: 1fr 1fr; gap: 6px; }
+      .panel { padding: 4px 6px 6px; }
+      .panel .nm { font-size: 16px; }
+      .bar-row { grid-template-columns: 30px 1fr; }
+      .bar-row .val { grid-column: 1 / -1; text-align: left; margin-top: -2px; }
+      .fighter { width: 45%; }
+      .cmds { grid-template-columns: 1fr 1fr; }
+      .cmd .d { display: none; }
+      .cmd { min-height: 50px; }
+      .msg { font-size: 14px; }
+      .vs-x { font-size: 30px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage-bg"></div>
+  <div class="streak" style="transform: rotate(205deg); background: linear-gradient(90deg, #fff, var(--p-glow) 20%, transparent);"></div>
+  <div class="streak" style="transform: rotate(155deg); background: linear-gradient(90deg, #fff, var(--p-glow) 20%, transparent);"></div>
+  <div class="streak" style="transform: rotate(-25deg); background: linear-gradient(90deg, #fff, var(--v-glow) 20%, transparent);"></div>
+  <div class="streak" style="transform: rotate(25deg); background: linear-gradient(90deg, #fff, var(--v-glow) 20%, transparent);"></div>
+
+  <div class="app">
+    <div class="topbar">
+      <a href="works.html">&laquo; 作品集へ戻る</a>
+      <button type="button" id="muteBtn" aria-pressed="false">♪ 音: ON</button>
+    </div>
+
+    <!-- ===== TITLE ===== -->
+    <section class="screen active" id="scr-title">
+      <div class="title-wrap">
+        <div class="title-fighters">
+          <div class="mon" data-mon="P100" data-flip="0"></div>
+          <div class="vs-x">×</div>
+          <div class="mon" data-mon="V100" data-flip="1"></div>
+        </div>
+        <h1 class="logo">地元のモンスター</h1>
+        <div class="logo-sub"><span class="p">P100</span><span class="v">V100</span></div>
+        <p class="tagline">── とある大学の地下サーバー室。今日もGPUの縄張り争いが始まる。</p>
+        <div class="menu-btns">
+          <button type="button" class="big-btn" data-go="1p">▶ ひとりで遊ぶ（vs CPU）</button>
+          <button type="button" class="big-btn" data-go="2p">▶ ふたりで遊ぶ（交代制）</button>
+        </div>
+        <div class="record" id="record"></div>
+        <div class="howto">
+          <h3>■ あそびかた</h3>
+          <ul>
+            <li>交互に技を選んで、相手の <b>HP</b> を 0 にしたら勝ち。</li>
+            <li>技を使うと <b>温度</b> が上がる。白線（限界温度）を超えると <b>サーマルスロットリング</b> で威力ダウン、100℃で <b>オーバーヒート</b> して1ターン休み。</li>
+            <li>強い技は <b>VRAM</b> を消費。足りないと使えない（CUDA out of memory）。</li>
+            <li>「ファン全開」で冷却＆VRAM回復。攻めどきと冷やしどきの見極めがカギ。</li>
+            <li>ときどきサーバー室で <b>イベント</b> が起きる。キーボードの 1〜5 でも技を選べます。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SELECT ===== -->
+    <section class="screen" id="scr-select">
+      <div class="select-head" id="selectHead">モンスターを選べ</div>
+      <p class="select-note" id="selectNote">相手はCPUが担当します</p>
+      <div class="cards" id="cards"></div>
+      <div class="back-row"><button type="button" class="big-btn sub" data-go="title">← タイトルへ</button></div>
+    </section>
+
+    <!-- ===== BATTLE ===== -->
+    <section class="screen" id="scr-battle">
+      <div class="hud">
+        <div class="panel" id="hud0"></div>
+        <div class="panel" id="hud1"></div>
+      </div>
+      <div class="arena" id="arena">
+        <div class="floor"></div>
+        <div class="place">📍 ○○大学 計算機棟 地下サーバー室 ／ ラウンド <span id="round">1</span></div>
+        <div class="fighter left" id="f0"><div class="bob"><div class="mon"></div></div></div>
+        <div class="fighter right" id="f1"><div class="bob"><div class="mon"></div></div></div>
+      </div>
+      <div class="msg" id="msg" aria-live="polite"></div>
+      <div id="cmdArea"></div>
+    </section>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    // ===================== DATA =====================
+    var MONS = {
+      P100: {
+        id: 'P100', full: 'Tesla P100', arch: 'Pascal / 2016年生まれ',
+        accent: '#76d82a', glow: '#8cff3a', face: '#fbfbf7', label: '#ffffff',
+        hp: 170, throttle: 95, fanCool: 40,
+        blurb: '研究室の片隅で何年も回り続けてきた古参の地元民。火力は控えめだが熱に強く、しぶとい。',
+        spec: [['HP', '170（高め）'], ['限界温度', '95℃（熱に強い）'], ['得意', '連続攻撃・自己修復'], ['実物', 'HBM2 16GB / 732GB/s']],
+        moves: [
+          { name: 'FP32ビーム', type: 'atk', pow: 18, hits: 1, acc: 100, heat: 8, vram: 0, desc: '単精度の素直な一撃。熱もVRAMも控えめ。' },
+          { name: 'FP16ダブル', type: 'atk', pow: 12, hits: 2, acc: 92, heat: 15, vram: 2, desc: '半精度で2倍速。2回ヒットする。' },
+          { name: 'NVLinkタックル', type: 'atk', pow: 33, hits: 1, acc: 85, heat: 22, vram: 4, desc: 'NVLink 1.0で全力突進。重いが外れることも。' },
+          { name: 'ユニファイドメモリ', type: 'heal', pow: 30, heat: 6, vram: 3, desc: 'ページ移行で体勢を立て直しHP回復。使うたびに回復量が減る。' },
+          { name: 'ファン全開', type: 'fan', heat: -40, vram: -5, desc: '温度を40℃下げ、VRAMを5GB回復。' }
+        ]
+      },
+      V100: {
+        id: 'V100', full: 'Tesla V100', arch: 'Volta / 2017年生まれ',
+        accent: '#e3c47a', glow: '#ffd766', face: '#f4e6c2', label: '#d9b563',
+        hp: 150, throttle: 88, fanCool: 35,
+        blurb: 'Tensor Coreを宿して現れた金色の新参者。一撃は重いが、すぐ熱くなるのが玉にキズ。',
+        spec: [['HP', '150（低め）'], ['限界温度', '88℃（熱に弱い）'], ['得意', '大技・ガード'], ['実物', 'HBM2 16/32GB / 900GB/s']],
+        moves: [
+          { name: 'FP32ビーム', type: 'atk', pow: 21, hits: 1, acc: 100, heat: 10, vram: 0, desc: '単精度でも一回り強い一撃。' },
+          { name: 'Tensor Core覚醒', type: 'atk', pow: 45, hits: 1, acc: 88, heat: 32, vram: 5, desc: '行列演算の暴力。最大火力だが発熱も最大。' },
+          { name: 'NVLink 2.0', type: 'atk', pow: 28, hits: 1, acc: 95, heat: 18, vram: 3, desc: '高帯域リンクで堅実に殴る。' },
+          { name: '独立スレッド', type: 'guard', heat: 4, vram: 2, desc: '独立スレッドスケジューリングで身をかわす。次に受ける攻撃を60%軽減。' },
+          { name: 'ファン全開', type: 'fan', heat: -35, vram: -5, desc: '温度を35℃下げ、VRAMを5GB回復。' }
+        ]
+      }
+    };
+    var VRAM_MAX = 16, HEAT_MIN = 30, HEAT_MAX = 100, HEAT_START = 40;
+
+    var EVENTS = [
+      { text: '空調が止まった！　サーバー室が蒸し風呂に……両者の温度 +15℃', fn: function (f) { f.forEach(function (x) { x.heat = Math.min(99, x.heat + 15); }); } },
+      { text: '冬の窓が開けっぱなしだ！　両者の温度 -15℃', fn: function (f) { f.forEach(function (x) { x.heat = Math.max(HEAT_MIN, x.heat - 15); }); } },
+      { text: '夜間バッチが終わった！　両者のVRAMが 4GB 空いた', fn: function (f) { f.forEach(function (x) { x.vram = Math.min(VRAM_MAX, x.vram + 4); }); } },
+      { text: '教授が電源ケーブルに足を引っかけた！', fn: function (f) { var x = f[Math.random() < 0.5 ? 0 : 1]; x.hp = Math.max(1, x.hp - 10); return x.mon.id + ' に10ダメージ！'; } },
+      { text: '学生が「ちょっとだけ」ジョブを投げてきた……両者のVRAM -3GB', fn: function (f) { f.forEach(function (x) { x.vram = Math.max(0, x.vram - 3); }); } }
+    ];
+
+    // ===================== SVG =====================
+    function monSVG(id, flip) {
+      var m = MONS[id];
+      var fins = '';
+      for (var i = 0; i < 21; i++) {
+        var x = 126 + i * 7;
+        fins += '<line x1="' + x + '" y1="34" x2="' + x + '" y2="96" stroke="#3a3a3a" stroke-width="2"/>';
+      }
+      var holes = '';
+      for (var r = 0; r < 5; r++) {
+        for (var c = 0; c < 2; c++) {
+          holes += '<rect x="' + (19 + c * 14) + '" y="' + (78 + r * 28) + '" width="10" height="20" rx="1.5" fill="#2a2d31"/>';
+        }
+      }
+      var textT = flip ? 'translate(73 172) scale(-1 1) rotate(-90)' : 'translate(73 172) rotate(-90)';
+      return '' +
+        '<svg viewBox="0 0 320 280" aria-hidden="true">' +
+        '<g transform="' + (flip ? 'translate(320 0) scale(-1 1) ' : '') + 'rotate(-12 160 140)">' +
+          '<g class="steam" fill="none" stroke="#ff8a70" stroke-width="5" stroke-linecap="round" opacity=".8">' +
+            '<path d="M150 18 q-8 -10 0 -20 q8 -10 0 -20"/>' +
+            '<path d="M200 16 q-8 -10 0 -20 q8 -10 0 -20"/>' +
+            '<path d="M250 20 q-8 -10 0 -20 q8 -10 0 -20"/>' +
+          '</g>' +
+          '<rect x="12" y="62" width="40" height="172" rx="3" fill="#dfe3e8" stroke="#111" stroke-width="3"/>' + holes +
+          '<rect x="70" y="238" width="44" height="14" fill="#d8ac3c" stroke="#6a4f10" stroke-width="2"/>' +
+          '<path d="M76 238v14M82 238v14M88 238v14M94 238v14M100 238v14M106 238v14" stroke="#8a6a1a" stroke-width="1.5"/>' +
+          '<path d="M60 44 Q60 22 82 22 L262 22 Q292 22 298 50 L302 192 Q302 234 262 242 L92 248 Q56 248 54 220 Z" fill="#101010" stroke="#000" stroke-width="4"/>' +
+          '<rect x="120" y="30" width="154" height="70" rx="6" fill="#1a1a1a" stroke="#000" stroke-width="2"/>' + fins +
+          '<line x1="124" y1="64" x2="270" y2="64" stroke="#555" stroke-width="1.5" stroke-dasharray="4 3"/>' +
+          '<path d="M66 44 Q66 30 80 29 L116 28 L116 64 L84 98 L66 92 Z" fill="' + m.accent + '" stroke="#000" stroke-width="3"/>' +
+          '<path d="M276 34 Q292 38 294 56 L298 172 L262 196 L262 112 Z" fill="' + m.accent + '" stroke="#000" stroke-width="3"/>' +
+          '<path d="M84 98 L116 64 L126 70 L96 104 Z" fill="#e9ecef" stroke="#000" stroke-width="2"/>' +
+          '<path d="M262 112 L276 34 L284 38 L270 114 Z" fill="#e9ecef" stroke="#000" stroke-width="2"/>' +
+          '<circle cx="108" cy="80" r="3" fill="#666"/><circle cx="273" cy="72" r="3" fill="#666"/>' +
+          '<rect x="56" y="104" width="36" height="138" fill="#0b0b0b"/>' +
+          '<text transform="' + textT + '" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="19" letter-spacing="2" fill="' + m.label + '">TESLA</text>' +
+          '<path d="M100 100 L248 104 Q262 104 262 118 L262 212 Q262 238 236 238 L128 238 Q98 238 98 210 Z" fill="' + m.face + '" stroke="#000" stroke-width="3"/>' +
+          '<rect class="eye" x="146" y="132" width="16" height="40" rx="8" fill="#0a0a0a"/>' +
+          '<rect class="eye" x="208" y="138" width="16" height="40" rx="8" fill="#0a0a0a"/>' +
+          '<g class="eye-x" stroke="#0a0a0a" stroke-width="6" stroke-linecap="round" fill="none">' +
+            '<path d="M142 140 L164 152 L142 164"/><path d="M228 146 L206 158 L228 170"/>' +
+          '</g>' +
+          '<ellipse cx="132" cy="188" rx="14" ry="8" fill="#ff9aa6" opacity=".65"/>' +
+          '<ellipse cx="240" cy="194" rx="14" ry="8" fill="#ff9aa6" opacity=".65"/>' +
+        '</g></svg>';
+    }
+
+    function paintMons(root) {
+      var els = (root || document).querySelectorAll('.mon[data-mon]');
+      for (var i = 0; i < els.length; i++) {
+        els[i].innerHTML = monSVG(els[i].getAttribute('data-mon'), els[i].getAttribute('data-flip') === '1');
+      }
+    }
+
+    // ===================== SOUND =====================
+    var actx = null, muted = false;
+    try { muted = localStorage.getItem('jimoto-mute') === '1'; } catch (e) {}
+    function ac() {
+      if (muted) return null;
+      if (!actx) {
+        var C = window.AudioContext || window.webkitAudioContext;
+        if (!C) return null;
+        actx = new C();
+      }
+      if (actx.state === 'suspended') actx.resume();
+      return actx;
+    }
+    function tone(freq, dur, type, vol, slide, delay) {
+      var a = ac(); if (!a) return;
+      var t = a.currentTime + (delay || 0);
+      var o = a.createOscillator(), g = a.createGain();
+      o.type = type || 'square';
+      o.frequency.setValueAtTime(freq, t);
+      if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, slide), t + dur);
+      g.gain.setValueAtTime(vol || 0.08, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(a.destination);
+      o.start(t); o.stop(t + dur + 0.02);
+    }
+    function noise(dur, vol, delay) {
+      var a = ac(); if (!a) return;
+      var t = a.currentTime + (delay || 0);
+      var buf = a.createBuffer(1, Math.floor(a.sampleRate * dur), a.sampleRate);
+      var d = buf.getChannelData(0);
+      for (var i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+      var s = a.createBufferSource(), g = a.createGain(), f = a.createBiquadFilter();
+      f.type = 'lowpass'; f.frequency.value = 1200;
+      s.buffer = buf; g.gain.value = vol || 0.12;
+      s.connect(f); f.connect(g); g.connect(a.destination); s.start(t);
+    }
+    var SFX = {
+      select: function () { tone(880, 0.06, 'square', 0.05); },
+      shot: function () { tone(1200, 0.18, 'sawtooth', 0.06, 200); },
+      hit: function () { noise(0.15, 0.18); tone(140, 0.12, 'square', 0.08, 60); },
+      crit: function () { noise(0.25, 0.25); tone(220, 0.25, 'sawtooth', 0.1, 50); },
+      miss: function () { tone(500, 0.15, 'triangle', 0.06, 250); },
+      heal: function () { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, 0.12, 'triangle', 0.07, null, i * 0.07); }); },
+      fan: function () { noise(0.6, 0.08); },
+      guard: function () { tone(660, 0.1, 'square', 0.05); tone(990, 0.15, 'square', 0.05, null, 0.08); },
+      big: function () { tone(80, 0.5, 'sawtooth', 0.1, 900); noise(0.4, 0.2, 0.3); },
+      over: function () { [400, 300, 200, 120].forEach(function (f, i) { tone(f, 0.15, 'square', 0.07, null, i * 0.12); }); },
+      event: function () { tone(1320, 0.08, 'square', 0.05); tone(1320, 0.08, 'square', 0.05, null, 0.14); },
+      win: function () { [523, 659, 784, 659, 784, 1047].forEach(function (f, i) { tone(f, 0.16, 'square', 0.06, null, i * 0.13); }); }
+    };
+    var muteBtn = document.getElementById('muteBtn');
+    function renderMute() {
+      muteBtn.textContent = muted ? '♪ 音: OFF' : '♪ 音: ON';
+      muteBtn.setAttribute('aria-pressed', muted ? 'true' : 'false');
+    }
+    muteBtn.addEventListener('click', function () {
+      muted = !muted;
+      try { localStorage.setItem('jimoto-mute', muted ? '1' : '0'); } catch (e) {}
+      renderMute();
+    });
+    renderMute();
+
+    // ===================== RECORD =====================
+    function loadRecord() {
+      try { return JSON.parse(localStorage.getItem('jimoto-record')) || { P100: 0, V100: 0 }; }
+      catch (e) { return { P100: 0, V100: 0 }; }
+    }
+    function addWin(id) {
+      var r = loadRecord(); r[id] = (r[id] || 0) + 1;
+      try { localStorage.setItem('jimoto-record', JSON.stringify(r)); } catch (e) {}
+    }
+    function renderRecord() {
+      var r = loadRecord();
+      document.getElementById('record').textContent = '通算勝利数 ── P100: ' + (r.P100 || 0) + '勝 ／ V100: ' + (r.V100 || 0) + '勝';
+    }
+
+    // ===================== SCREENS =====================
+    var mode = '1p';
+    function show(id) {
+      var s = document.querySelectorAll('.screen');
+      for (var i = 0; i < s.length; i++) s[i].classList.toggle('active', s[i].id === 'scr-' + id);
+      document.getElementById('overlay').classList.remove('show');
+      window.scrollTo(0, 0);
+    }
+    document.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-go]');
+      if (!b) return;
+      SFX.select();
+      var go = b.getAttribute('data-go');
+      if (go === '1p' || go === '2p') { mode = go; openSelect(); }
+      else if (go === 'title') { battle = null; renderRecord(); show('title'); }
+      else if (go === 'select') { battle = null; openSelect(); }
+      else if (go === 'rematch') { startBattle(lastSetup); }
+    });
+
+    function openSelect() {
+      document.getElementById('selectHead').textContent = mode === '1p' ? 'モンスターを選べ' : '1Pのモンスターを選べ';
+      document.getElementById('selectNote').textContent = mode === '1p'
+        ? '相手はCPUが担当します'
+        : '2Pはもう一方を担当。1台の端末で交代しながら遊びます';
+      var html = '';
+      ['P100', 'V100'].forEach(function (id) {
+        var m = MONS[id], cls = id === 'P100' ? 'p' : 'v';
+        html += '<button type="button" class="card ' + cls + '" data-pick="' + id + '">' +
+          '<div class="mon" data-mon="' + id + '" data-flip="' + (id === 'V100' ? '1' : '0') + '"></div>' +
+          '<h3>' + id + '</h3><div class="arch">' + m.full + ' ／ ' + m.arch + '</div>' +
+          '<p>' + m.blurb + '</p><dl class="spec">' +
+          m.spec.map(function (s) { return '<dt>' + s[0] + '</dt><dd>' + s[1] + '</dd>'; }).join('') +
+          '</dl></button>';
+      });
+      var cards = document.getElementById('cards');
+      cards.innerHTML = html;
+      paintMons(cards);
+      show('select');
+    }
+    document.getElementById('cards').addEventListener('click', function (e) {
+      var c = e.target.closest('[data-pick]');
+      if (!c) return;
+      SFX.select();
+      var p = c.getAttribute('data-pick');
+      // 左にP100、右にV100を固定して見栄えを原画に合わせる
+      var setup = p === 'P100'
+        ? { left: 'P100', right: 'V100', human: [true, mode === '2p'], p1: 0 }
+        : { left: 'P100', right: 'V100', human: [mode === '2p', true], p1: 1 };
+      startBattle(setup);
+    });
+
+    // ===================== BATTLE =====================
+    var battle = null, lastSetup = null, busy = false;
+    var msgEl = document.getElementById('msg');
+    var cmdArea = document.getElementById('cmdArea');
+
+    function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+    function rnd(a, b) { return a + Math.random() * (b - a); }
+
+    function makeFighter(id, side, human, label) {
+      var m = MONS[id];
+      return { mon: m, side: side, hp: m.hp, vram: VRAM_MAX, heat: HEAT_START, guard: false, healUses: 0, skip: false, human: human, label: label };
+    }
+
+    function startBattle(setup) {
+      lastSetup = setup;
+      var labels = mode === '1p'
+        ? [setup.human[0] ? 'あなた' : 'CPU', setup.human[1] ? 'あなた' : 'CPU']
+        : [setup.p1 === 0 ? '1P' : '2P', setup.p1 === 1 ? '1P' : '2P'];
+      battle = {
+        f: [makeFighter(setup.left, 0, setup.human[0], labels[0]), makeFighter(setup.right, 1, setup.human[1], labels[1])],
+        cur: setup.p1, round: 1, turns: 0, over: false, id: Math.random()
+      };
+      document.getElementById('round').textContent = '1';
+      ['f0', 'f1'].forEach(function (fid, i) {
+        var el = document.getElementById(fid);
+        el.className = 'fighter ' + (i === 0 ? 'left' : 'right');
+        var mon = el.querySelector('.mon');
+        mon.setAttribute('data-mon', battle.f[i].mon.id);
+        mon.setAttribute('data-flip', i === 1 ? '1' : '0');
+        mon.classList.remove('hurt');
+      });
+      paintMons(document.getElementById('arena'));
+      msgEl.innerHTML = '';
+      show('battle');
+      renderHUD();
+      log('野生の ' + battle.f[1 - battle.cur].mon.id + ' が あらわれた！');
+      log('地元の縄張りを賭けて、バトル開始！');
+      beginTurn(battle.id);
+    }
+
+    function hudHTML(x, isTurn) {
+      var m = x.mon;
+      var hpPct = Math.max(0, x.hp) / m.hp * 100;
+      var hpCls = hpPct <= 25 ? 'low' : hpPct <= 50 ? 'mid' : '';
+      var heatPct = (x.heat - HEAT_MIN) / (HEAT_MAX - HEAT_MIN) * 100;
+      var limPct = (m.throttle - HEAT_MIN) / (HEAT_MAX - HEAT_MIN) * 100;
+      var tags = '';
+      if (x.heat >= m.throttle) tags += '<span class="tag hot">THROTTLE</span>';
+      if (x.guard) tags += '<span class="tag guard">GUARD</span>';
+      if (x.vram < 2) tags += '<span class="tag oom">VRAM残りわずか</span>';
+      if (x.skip) tags += '<span class="tag hot">OVERHEAT</span>';
+      return '<div class="name-row"><span class="nm" style="color:' + m.accent + '">' + m.id + '</span>' +
+        '<span class="who">' + x.label + (isTurn ? ' ◀ 行動中' : '') + '</span></div>' +
+        '<div class="bar-row"><span class="lbl">HP</span><div class="bar hp ' + hpCls + '"><i style="width:' + hpPct + '%"></i></div><span class="val">' + Math.max(0, x.hp) + ' / ' + m.hp + '</span></div>' +
+        '<div class="bar-row"><span class="lbl">VRAM</span><div class="bar vram"><i style="width:' + (x.vram / VRAM_MAX * 100) + '%"></i></div><span class="val">' + x.vram + ' / ' + VRAM_MAX + 'GB</span></div>' +
+        '<div class="bar-row"><span class="lbl">温度</span><div class="bar heat"><i style="width:' + Math.max(0, heatPct) + '%"></i><span class="limit" style="left:' + limPct + '%"></span></div><span class="val">' + x.heat + '℃</span></div>' +
+        '<div class="tags">' + tags + '</div>';
+    }
+
+    function renderHUD() {
+      if (!battle) return;
+      for (var i = 0; i < 2; i++) {
+        var x = battle.f[i];
+        var p = document.getElementById('hud' + i);
+        var isTurn = !battle.over && battle.cur === i;
+        p.innerHTML = hudHTML(x, isTurn);
+        p.classList.toggle('turn', isTurn);
+        p.style.setProperty('--glow', x.mon.glow);
+        var fe = document.getElementById('f' + i);
+        fe.classList.toggle('hot', x.heat >= x.mon.throttle);
+        fe.classList.toggle('guarding', x.guard);
+      }
+    }
+
+    function log(text) {
+      var lines = msgEl.querySelectorAll('.line');
+      for (var i = 0; i < lines.length; i++) lines[i].classList.add('old');
+      while (msgEl.children.length > 3) msgEl.removeChild(msgEl.firstChild);
+      var s = document.createElement('span');
+      s.className = 'line';
+      s.textContent = text;
+      msgEl.appendChild(s);
+    }
+
+    function fx(cls, idx, ms) {
+      var el = document.getElementById('f' + idx);
+      el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls);
+      setTimeout(function () { el.classList.remove(cls); }, ms || 450);
+    }
+    function hurtFace(idx, ms) {
+      var mon = document.querySelector('#f' + idx + ' .mon');
+      mon.classList.add('hurt');
+      setTimeout(function () { if (battle && battle.f[idx].hp > 0) mon.classList.remove('hurt'); }, ms || 600);
+    }
+    function popup(idx, text, color, small) {
+      var arena = document.getElementById('arena');
+      var fe = document.getElementById('f' + idx);
+      var p = document.createElement('div');
+      p.className = 'popup' + (small ? ' small' : '');
+      p.textContent = text;
+      p.style.color = color || '#fff';
+      p.style.left = (fe.offsetLeft + fe.offsetWidth / 2) + 'px';
+      p.style.top = (fe.offsetTop + fe.offsetHeight * 0.25 + (Math.random() * 20 - 10)) + 'px';
+      arena.appendChild(p);
+      setTimeout(function () { p.remove(); }, 1000);
+    }
+    function beam(fromIdx, color, thick) {
+      var arena = document.getElementById('arena');
+      var b = document.createElement('div');
+      b.className = 'beam';
+      b.style.background = 'linear-gradient(' + (fromIdx === 0 ? '90deg' : '270deg') + ', #fff, ' + color + ')';
+      b.style.boxShadow = '0 0 18px ' + color;
+      b.style.transformOrigin = fromIdx === 0 ? 'left center' : 'right center';
+      if (thick) { b.style.height = '34px'; b.style.top = '40%'; b.style.borderRadius = '17px'; }
+      arena.appendChild(b);
+      setTimeout(function () { b.remove(); }, 400);
+    }
+    function flash(color) {
+      var arena = document.getElementById('arena');
+      var f = document.createElement('div');
+      f.className = 'flash';
+      f.style.background = color;
+      arena.appendChild(f);
+      setTimeout(function () { f.remove(); }, 520);
+    }
+
+    function canUse(x, mv) { return mv.vram <= 0 || x.vram >= mv.vram; }
+
+    function healAmount(x, mv) { return Math.max(10, mv.pow - 7 * x.healUses); }
+
+    function expectedDmg(x, mv, target) {
+      if (mv.type !== 'atk') return 0;
+      var d = mv.pow * mv.hits * (mv.acc / 100);
+      if (x.heat >= x.mon.throttle) d *= 0.6;
+      if (target.guard) d *= 0.4;
+      return d;
+    }
+
+    // ---- CPU AI ----
+    function cpuChoose(x, t) {
+      var mvs = x.mon.moves;
+      var fan = mvs[4];
+      var usable = mvs.filter(function (m) { return canUse(x, m); });
+      var attacks = usable.filter(function (m) { return m.type === 'atk'; });
+
+      // 確実に倒せる技があれば迷わず撃つ
+      var killers = attacks.filter(function (m) {
+        var min = m.pow * 0.9 * (x.heat >= x.mon.throttle ? 0.6 : 1) * (t.guard ? 0.4 : 1) * m.hits;
+        return min >= t.hp && m.acc >= 90;
+      });
+      if (killers.length) return killers[0];
+
+      if (x.heat >= x.mon.throttle - 3 && Math.random() < 0.85) return fan;
+      if (x.vram <= 2 && Math.random() < 0.5) return fan;
+
+      if (x.mon.id === 'P100' && x.hp < x.mon.hp * 0.4 && x.healUses < 3 && canUse(x, mvs[3]) && Math.random() < 0.65) return mvs[3];
+      if (x.mon.id === 'V100' && !x.guard && canUse(x, mvs[3]) && x.hp < x.mon.hp * 0.5 && Math.random() < 0.3) return mvs[3];
+
+      // オーバーヒートする技は避ける
+      var safe = attacks.filter(function (m) { return x.heat + m.heat < HEAT_MAX; });
+      if (!safe.length) return fan;
+      var weights = safe.map(function (m) { var e = expectedDmg(x, m, t); return e * e; });
+      var sum = weights.reduce(function (a, b) { return a + b; }, 0);
+      var r = Math.random() * sum;
+      for (var i = 0; i < safe.length; i++) { r -= weights[i]; if (r <= 0) return safe[i]; }
+      return safe[0];
+    }
+
+    // ---- turn flow ----
+    async function beginTurn(bid) {
+      if (!battle || battle.id !== bid || battle.over) return;
+      var x = battle.f[battle.cur];
+      renderHUD();
+
+      if (x.skip) {
+        x.skip = false;
+        x.heat = 65;
+        log(x.mon.id + ' はオーバーヒートで強制クールダウン中……動けない！');
+        SFX.over();
+        renderHUD();
+        await sleep(1200);
+        return endTurn(bid);
+      }
+
+      if (x.human) {
+        renderCommands(x);
+      } else {
+        cmdArea.innerHTML = '<div class="waiting">' + x.mon.id + '（CPU）が考えている……</div>';
+        await sleep(900);
+        if (!battle || battle.id !== bid) return;
+        await act(bid, cpuChoose(x, battle.f[1 - battle.cur]));
+      }
+    }
+
+    function renderCommands(x) {
+      var html = '<div class="cmds">';
+      x.mon.moves.forEach(function (mv, i) {
+        var cost = [];
+        if (mv.vram > 0) cost.push('VRAM ' + mv.vram + 'GB');
+        if (mv.vram < 0) cost.push('VRAM +' + (-mv.vram) + 'GB');
+        cost.push('温度 ' + (mv.heat > 0 ? '+' : '') + mv.heat + '℃');
+        if (mv.type === 'atk') cost.unshift('威力 ' + mv.pow + (mv.hits > 1 ? '×' + mv.hits : '') + ' / 命中 ' + mv.acc + '%');
+        if (mv.type === 'heal') cost.unshift('回復 ' + healAmount(x, mv));
+        var dis = !canUse(x, mv);
+        html += '<button type="button" class="cmd" data-mv="' + i + '"' + (dis ? ' disabled' : '') +
+          ' style="--acc:' + x.mon.accent + '">' +
+          '<div><span class="k">[' + (i + 1) + ']</span><span class="t">' + mv.name + '</span></div>' +
+          '<div class="c">' + (dis ? 'VRAM不足！' : cost.join(' ／ ')) + '</div>' +
+          '<div class="d">' + mv.desc + '</div></button>';
+      });
+      html += '</div>';
+      cmdArea.innerHTML = html;
+      if (mode === '2p') log(x.label + '（' + x.mon.id + '）の番だ。技を選べ！');
+    }
+
+    cmdArea.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-mv]');
+      if (!b || b.disabled) return;
+      pickMove(+b.getAttribute('data-mv'));
+    });
+    document.addEventListener('keydown', function (e) {
+      if (!battle || battle.over || busy) return;
+      if (!document.getElementById('scr-battle').classList.contains('active')) return;
+      var n = parseInt(e.key, 10);
+      if (n >= 1 && n <= 5) {
+        var b = cmdArea.querySelector('[data-mv="' + (n - 1) + '"]');
+        if (b && !b.disabled) pickMove(n - 1);
+      }
+    });
+
+    function pickMove(i) {
+      if (busy || !battle || battle.over) return;
+      var x = battle.f[battle.cur];
+      if (!x.human) return;
+      var mv = x.mon.moves[i];
+      if (!canUse(x, mv)) return;
+      SFX.select();
+      act(battle.id, mv);
+    }
+
+    async function act(bid, mv) {
+      busy = true;
+      cmdArea.innerHTML = '<div class="waiting">……</div>';
+      var ai = battle.cur, ti = 1 - ai;
+      var x = battle.f[ai], t = battle.f[ti];
+      var throttled = x.heat >= x.mon.throttle;
+
+      log(x.mon.id + ' の ' + mv.name + '！');
+      if (mv.vram > 0) x.vram -= mv.vram;
+
+      if (mv.type === 'atk') {
+        if (throttled) { log('サーマルスロットリング中……クロックが上がらない！'); await sleep(500); }
+        var total = 0, landed = 0, big = mv.pow >= 40;
+        fx('lunge', ai, 380);
+        if (big) { SFX.big(); flash(x.mon.glow); await sleep(250); }
+        for (var h = 0; h < mv.hits; h++) {
+          if (h > 0) await sleep(300);
+          beam(ai, x.mon.glow, big);
+          SFX.shot();
+          await sleep(230);
+          if (Math.random() * 100 >= mv.acc) {
+            SFX.miss();
+            popup(ti, 'MISS', '#aaa', true);
+            log('しかし ' + t.mon.id + ' には当たらなかった！');
+            continue;
+          }
+          var dmg = mv.pow * rnd(0.9, 1.1);
+          if (throttled) dmg *= 0.6;
+          var crit = Math.random() < 0.08;
+          if (crit) dmg *= 1.5;
+          if (t.guard) dmg *= 0.4;
+          dmg = Math.max(1, Math.round(dmg));
+          t.hp = Math.max(0, t.hp - dmg);
+          total += dmg; landed++;
+          if (crit) { SFX.crit(); flash('rgba(255,255,255,.7)'); } else SFX.hit();
+          fx('shake', ti, 420);
+          hurtFace(ti, 650);
+          popup(ti, (crit ? 'ECC! ' : '') + dmg, crit ? '#ffe94d' : '#fff');
+          if (crit) log('ビット反転！　クリティカルヒット！');
+          renderHUD();
+          if (t.hp <= 0) break;
+        }
+        if (t.guard && landed) { log(t.mon.id + ' は独立スレッドで攻撃をいなした！'); t.guard = false; }
+        if (landed) log(t.mon.id + ' に ' + total + ' のダメージ！');
+      } else if (mv.type === 'heal') {
+        var amt = Math.min(healAmount(x, mv), x.mon.hp - x.hp);
+        x.healUses++;
+        x.hp += amt;
+        SFX.heal();
+        fx('heal', ai, 700);
+        popup(ai, '+' + amt, '#7cffb0');
+        log(x.mon.id + ' はページを整理して HP が ' + amt + ' 回復した！');
+      } else if (mv.type === 'guard') {
+        x.guard = true;
+        SFX.guard();
+        popup(ai, 'GUARD', '#7fc8ff', true);
+        log(x.mon.id + ' は身構えた！　次の攻撃を大きく軽減する。');
+      } else if (mv.type === 'fan') {
+        SFX.fan();
+        popup(ai, '-' + (-mv.heat) + '℃', '#7fc8ff', true);
+        log('ブォォォォン！　' + x.mon.id + ' のファンが唸りを上げる。温度が下がり、VRAMが空いた。');
+      }
+
+      // 温度・VRAM反映
+      x.heat = Math.max(HEAT_MIN, Math.min(HEAT_MAX, x.heat + mv.heat));
+      if (mv.vram < 0) x.vram = Math.min(VRAM_MAX, x.vram - mv.vram);
+      renderHUD();
+      await sleep(700);
+      if (!battle || battle.id !== bid) return;
+
+      if (t.hp <= 0) return finish(bid, ai);
+
+      if (x.heat >= HEAT_MAX) {
+        x.skip = true;
+        SFX.over();
+        popup(ai, 'OVERHEAT', '#ff4d3d', true);
+        log(x.mon.id + ' が 100℃ に達した！　オーバーヒート！　次のターンは動けない！');
+        renderHUD();
+        await sleep(1000);
+      } else if (!throttled && x.heat >= x.mon.throttle && mv.type === 'atk') {
+        log(x.mon.id + ' の温度が ' + x.mon.throttle + '℃ を超えた……スロットリングが始まる！');
+        await sleep(700);
+      }
+      return endTurn(bid);
+    }
+
+    async function endTurn(bid) {
+      if (!battle || battle.id !== bid) return;
+      battle.turns++;
+      battle.cur = 1 - battle.cur;
+      var nx = battle.f[battle.cur];
+      // 自分の番の開始時に少し自然冷却
+      if (!nx.skip) nx.heat = Math.max(HEAT_MIN, nx.heat - 4);
+
+      if (battle.turns % 2 === 0) {
+        battle.round++;
+        document.getElementById('round').textContent = battle.round;
+        if (battle.round >= 3 && Math.random() < 0.2) {
+          var ev = EVENTS[Math.floor(Math.random() * EVENTS.length)];
+          SFX.event();
+          log('【サーバー室イベント】' + ev.text);
+          var extra = ev.fn(battle.f);
+          renderHUD();
+          if (extra) { await sleep(600); log(extra); }
+          await sleep(1400);
+          if (!battle || battle.id !== bid) return;
+        }
+      }
+      busy = false;
+      beginTurn(bid);
+    }
+
+    async function finish(bid, winnerIdx) {
+      battle.over = true;
+      var w = battle.f[winnerIdx], l = battle.f[1 - winnerIdx];
+      var lmon = document.querySelector('#f' + (1 - winnerIdx) + ' .mon');
+      lmon.classList.add('hurt');
+      document.getElementById('f' + (1 - winnerIdx)).classList.add('ko');
+      log(l.mon.id + ' は たおれた……');
+      renderHUD();
+      cmdArea.innerHTML = '';
+      addWin(w.mon.id);
+      await sleep(1100);
+      if (!battle || battle.id !== bid) return;
+      SFX.win();
+      var headline = mode === '1p' ? (w.human ? 'YOU WIN!' : 'YOU LOSE…') : w.label + ' の勝利！';
+      var comment = w.mon.id === 'P100'
+        ? '古参の意地！　地元の縄張りは P100 のものだ。'
+        : '世代交代！　サーバー室の新しい主は V100 だ。';
+      var r = document.getElementById('result');
+      r.style.setProperty('--glow', w.mon.glow);
+      r.innerHTML = '<p class="ko">K.O.</p>' +
+        '<div class="mon" data-mon="' + w.mon.id + '" data-flip="' + (w.side === 1 ? '1' : '0') + '"></div>' +
+        '<div class="wn" style="color:' + w.mon.accent + '">' + headline + '</div>' +
+        '<p>' + comment + '（' + battle.round + 'ラウンド）</p>' +
+        '<div class="menu-btns">' +
+          '<button type="button" class="big-btn" data-go="rematch">もう一戦</button>' +
+          '<button type="button" class="big-btn sub" data-go="select">モンスター選択へ</button>' +
+          '<button type="button" class="big-btn sub" data-go="title">タイトルへ</button>' +
+        '</div>';
+      paintMons(r);
+      document.getElementById('overlay').classList.add('show');
+      busy = false;
+      var first = r.querySelector('.big-btn');
+      if (first) first.focus();
+    }
+
+    // ===================== INIT =====================
+    paintMons(document.getElementById('scr-title'));
+    renderRecord();
+  })();
+  </script>
+</body>
+</html>
